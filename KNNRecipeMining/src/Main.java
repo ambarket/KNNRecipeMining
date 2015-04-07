@@ -244,16 +244,25 @@ class RunSomeOfTheTests implements Runnable {
 	}
 	@Override
 	public void run() {
-		System.out.println("here");
 		for (int i = start; i < end; i++) {
 			Recipe test = trainingData.get(i);
 			int predictedCuisine = predictCuisine(test);
 			if (predictedCuisine == test.cuisine) {
 				correct++;
-				System.out.println("i = " + i + " on thread: " + threadNum + " Correct");
+				//System.out.println("i = " + i + " on thread: " + threadNum + " Correct");
 			}
 			else {
-				System.out.println("i = " + i + " on thread: " + threadNum + " incorrect");
+				//System.out.println("i = " + i + " on thread: " + threadNum + " incorrect");
+			}
+			if ((i - start) % 1000 == 0) {
+				double startTime, endTime, minutes, seconds;
+				startTime = System.currentTimeMillis();
+
+
+				endTime = System.currentTimeMillis();
+				//seconds = (endTime - startTime) / 1000;
+				minutes = (endTime - startTime) / 1000 / 60;
+				System.out.println("Thread: " + threadNum + " found " + correct + " out of " + (i - start) + " so far " + " in " + minutes);
 			}
 		}
 		callback.receiveData(threadNum, correct);
