@@ -245,7 +245,7 @@ class RunSomeOfTheTests implements Runnable {
 	@Override
 	public void run() {
 		for (int i = start; i < end; i++) {
-			double startTime, endTime, minutes, seconds;
+			long startTime, endTime, minutes, seconds;
 			startTime = System.currentTimeMillis();
 			Recipe test = trainingData.get(i);
 			int predictedCuisine = predictCuisine(test);
@@ -258,9 +258,9 @@ class RunSomeOfTheTests implements Runnable {
 			}
 			if ((i - start) % 1000 == 0) {
 				endTime = System.currentTimeMillis();
-				//seconds = (endTime - startTime) / 1000;
-				minutes = (endTime - startTime) / 1000 / 60;
-				System.out.println("Thread: " + threadNum + " found " + correct + " out of " + (i - start) + " so far " + " in " + minutes);
+				seconds = (endTime - startTime) / 1000;
+				//minutes = (endTime - startTime) / 1000 / 60;
+				System.out.println("Thread: " + threadNum + " found " + correct + " out of " + (i - start) + " so far" + " in " + seconds);
 				startTime = System.currentTimeMillis();
 			}
 		}
