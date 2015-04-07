@@ -28,11 +28,7 @@ public class Main {
 		startTime = System.nanoTime();
 		
 		//crossValidate();
-		//test();
-		
-		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, 10, 4);
-		c.runAllThreads();
-		
+		test();
 		endTime = System.nanoTime();
 		duration = (endTime - startTime) / 1000000 / 1000;
 		System.out.println(duration);
@@ -152,10 +148,6 @@ class Recipe {
 
 	}
 	
-	public boolean equalsRecipe(Recipe other) {
-		return cuisine != -1 && other.cuisine != -1 && ingredients.size() == other.ingredients.size() && ingredients.containsAll(other.ingredients);
-	}
-	
 	/*
 	public void setDistance(double distance) {
 		this.distance = distance;
@@ -185,125 +177,6 @@ class Recipe {
 		}
 		
 		return 1 - intersectSize / unionSize;
-	}
-}
-
-interface GetDataFromThread {
-	void receiveData(int threadNum, int count);
-}
-
-class CrossValidateOnNThreads implements GetDataFromThread {
-	boolean[] completedThreads;
-	
-	ArrayList<Recipe> trainingData;
-	int k, numberOfThreads;
-	
-	double correctPredictions = 0;
-	
-	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, int k, int numberOfThreads) {
-		this.trainingData = trainingData;
-		this.k = k;
-		this.numberOfThreads = numberOfThreads;
-		completedThreads = new boolean[numberOfThreads];
-	}
-	
-	public void runAllThreads() {
-		int numberPerThread = trainingData.size() / numberOfThreads;
-		for (int i = 0; i < numberOfThreads; i++) {
-			RunSomeOfTheTests tmp = new RunSomeOfTheTests(i * numberPerThread, ((i+1) * numberPerThread - 1), trainingData, i, k, this);
-			new Thread(tmp).start();
-		}
-	}
-	
-	public synchronized void receiveData(int threadNum, int count) {
-		completedThreads[threadNum] = true;
-		correctPredictions += count;
-		
-		boolean done = true;
-		for (int i = 0; i < numberOfThreads; i++) {
-			done = done && completedThreads[i];
-		}
-		
-		if (done) {
-			System.out.println("Accuracy: " + correctPredictions / trainingData.size());
-		}
-	}
-}
-
-class RunSomeOfTheTests implements Runnable {
-	int start, end, threadNum, k, correct = 0;
-	GetDataFromThread callback;
-	ArrayList<Recipe> trainingData;
-	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, int threadNum, int k, GetDataFromThread callback) {
-		this.start = start;
-		this.end = end;
-		this.k = k;
-		this.threadNum = threadNum;
-		this.trainingData = trainingData;
-		this.callback = callback;
-	}
-	@Override
-	public void run() {
-
-		for (int i = start; i < end; i++) {
-			Recipe test = trainingData.get(i);
-			int predictedCuisine = predictCuisine(test);
-			if (predictedCuisine == test.cuisine) {
-				correct++;
-			}
-		}
-		callback.receiveData(threadNum, correct);
-	}
-	
-	public int predictCuisine(Recipe test) {
-		Recipe[] nearestNeighbors = new Recipe[k];
-		
-		for (int i = 0; i < k;) {
-			if (!test.equalsRecipe(trainingData.get(i))) {
-				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-				nearestNeighbors[i] = trainingData.get(i);
-				moveRecipeToCorrectLocation(i, nearestNeighbors);
-				i++;
-			}
-		}
-		
-		for (int i = k; i < trainingData.size(); ) {
-			if (!test.equalsRecipe(trainingData.get(i))) {
-				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-				if (trainingData.get(i).distance < nearestNeighbors[k-1].distance) {
-					nearestNeighbors[k-1] = trainingData.get(i);
-					moveRecipeToCorrectLocation(k-1, nearestNeighbors);
-				}
-				i++;
-			}
-		}
-		
-		// We now have the k nearest neighbors.
-		int[] votes = new int[8];
-		
-		for (int i = 0; i < k; i++) {
-			votes[nearestNeighbors[i].cuisine]++;
-		}
-		
-		int maxVotes = -1;
-		int predictedCuisine = -1;
-		for (int i = 0; i < 8; i++) {
-			if (votes[i] > maxVotes) {
-				maxVotes = votes[i];
-				predictedCuisine = i;
-			}
-		}
-		return predictedCuisine;
-	}
-	
-	public static void moveRecipeToCorrectLocation(int position, Recipe[] nearestNeighbors) {
-		for (int j = position; j > 0; j--) {
-			if (nearestNeighbors[j].distance < nearestNeighbors[j-1].distance) {
-				Recipe tmp = nearestNeighbors[j-1];
-				nearestNeighbors[j-1] = nearestNeighbors[j];
-				nearestNeighbors[j] = tmp;
-			}
-		}
 	}
 }
 
