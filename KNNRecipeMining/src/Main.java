@@ -244,12 +244,16 @@ class RunSomeOfTheTests implements Runnable {
 	}
 	@Override
 	public void run() {
-
+		System.out.println("here");
 		for (int i = start; i < end; i++) {
 			Recipe test = trainingData.get(i);
 			int predictedCuisine = predictCuisine(test);
 			if (predictedCuisine == test.cuisine) {
 				correct++;
+				System.out.println("i = " + i + " on thread: " + threadNum + " Correct");
+			}
+			else {
+				System.out.println("i = " + i + " on thread: " + threadNum + " incorrect");
 			}
 		}
 		callback.receiveData(threadNum, correct);
@@ -258,39 +262,41 @@ class RunSomeOfTheTests implements Runnable {
 	public int predictCuisine(Recipe test) {
 		Recipe[] nearestNeighbors = new Recipe[k];
 		
-		for (int i = 0; i < k;) {
+		int i = 0;
+		for (int lastNearestNeighbor = 0; lastNearestNeighbor < k;) {
 			if (!test.equalsRecipe(trainingData.get(i))) {
 				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-				nearestNeighbors[i] = trainingData.get(i);
-				moveRecipeToCorrectLocation(i, nearestNeighbors);
-				i++;
+				nearestNeighbors[lastNearestNeighbor] = trainingData.get(i);
+				moveRecipeToCorrectLocation(lastNearestNeighbor, nearestNeighbors);
+				lastNearestNeighbor++;
 			}
+			i++;
 		}
 		
-		for (int i = k; i < trainingData.size(); ) {
+		for (; i < trainingData.size(); i++) {
 			if (!test.equalsRecipe(trainingData.get(i))) {
 				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
 				if (trainingData.get(i).distance < nearestNeighbors[k-1].distance) {
 					nearestNeighbors[k-1] = trainingData.get(i);
 					moveRecipeToCorrectLocation(k-1, nearestNeighbors);
 				}
-				i++;
+				
 			}
 		}
 		
 		// We now have the k nearest neighbors.
 		int[] votes = new int[8];
 		
-		for (int i = 0; i < k; i++) {
-			votes[nearestNeighbors[i].cuisine]++;
+		for (int j = 0; j < k; j++) {
+			votes[nearestNeighbors[j].cuisine]++;
 		}
 		
 		int maxVotes = -1;
 		int predictedCuisine = -1;
-		for (int i = 0; i < 8; i++) {
-			if (votes[i] > maxVotes) {
-				maxVotes = votes[i];
-				predictedCuisine = i;
+		for (int j = 0; j < 8; j++) {
+			if (votes[j] > maxVotes) {
+				maxVotes = votes[j];
+				predictedCuisine = j;
 			}
 		}
 		return predictedCuisine;
