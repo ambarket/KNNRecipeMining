@@ -16,96 +16,19 @@ public class Main {
 		k = 10;
 		
 		trainingData = readTrainingFile();
-		/*
-		for (Recipe r : trainingData) {
-			for (Recipe r2 : trainingData) {
-				System.out.println(r.jaccardDistance(r2));
-			}
-			//System.out.println(r);
-		}
-		*/
+		
 		long startTime, endTime, duration;
 		startTime = System.nanoTime();
 		
-		//crossValidate();
-		//test();
-		
-		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, 10, 4);
+		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, 50, 4);
 		c.runAllThreads();
+		
+		//SingleThreaded.crossValidate(k, trainingData);
 		
 		endTime = System.nanoTime();
 		duration = (endTime - startTime) / 1000000 / 1000;
 		System.out.println(duration);
 	}
-	
-	public static void crossValidate() {
-		
-		double correct = 0;
-		int testNum = 0;
-		for (Recipe test : trainingData) {
-			//System.out.println("TestNum: " + testNum++);
-			int predictedCuisine = predictCuisine(test);
-			if (predictedCuisine == test.cuisine) {
-				correct++;
-			}
-		}
-		System.out.println(correct / (trainingData.size() - 1));
-	}
-	
-	public static void test() {
-		Scanner sc = new Scanner(System.in);
-		Recipe test;
-		while (sc.hasNextLine()) {
-			test = new Recipe(false, sc.nextLine());
-			System.out.println(predictCuisine(test));
-		}
-	}
-	
-	public static int predictCuisine(Recipe test) {
-		Recipe[] nearestNeighbors = new Recipe[k];
-		
-		for (int i = 0; i < k; i++) {
-			trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-			nearestNeighbors[i] = trainingData.get(i);
-			moveRecipeToCorrectLocation(i, nearestNeighbors);
-		}
-		
-		for (int i = k; i < trainingData.size(); i++) {
-			trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-			if (trainingData.get(i).distance < nearestNeighbors[k-1].distance) {
-				nearestNeighbors[k-1] = trainingData.get(i);
-				moveRecipeToCorrectLocation(k-1, nearestNeighbors);
-			}
-		}
-		
-		// We now have the k nearest neighbors.
-		int[] votes = new int[8];
-		
-		for (int i = 0; i < k; i++) {
-			votes[nearestNeighbors[i].cuisine]++;
-		}
-		
-		int maxVotes = -1;
-		int predictedCuisine = -1;
-		for (int i = 0; i < 8; i++) {
-			if (votes[i] > maxVotes) {
-				maxVotes = votes[i];
-				predictedCuisine = i;
-			}
-		}
-		return predictedCuisine;
-	}
-	
-	public static void moveRecipeToCorrectLocation(int position, Recipe[] nearestNeighbors) {
-		for (int j = position; j > 0; j--) {
-			if (nearestNeighbors[j].distance < nearestNeighbors[j-1].distance) {
-				Recipe tmp = nearestNeighbors[j-1];
-				nearestNeighbors[j-1] = nearestNeighbors[j];
-				nearestNeighbors[j] = tmp;
-			}
-		}
-	}
-	
 	
 	public static ArrayList<Recipe> readTrainingFile() {
 		String trainingFile = "training-data.txt";
@@ -128,196 +51,13 @@ public class Main {
 
 		return trainingRecipes;
 	}
-}
-
-class Recipe {
-	public double distance; // Only relevant in the context of a particular run of predictCuisine.
-	public int cuisine;
-	HashSet<String> ingredients;
 	
-	public Recipe(boolean training, String line) {
-		ingredients = new HashSet<String>();
-		String[] lineArray = line.split(" ");
-		if (training) {
-			cuisine = Integer.parseInt(lineArray[0]);
-		}
-		else {
-			cuisine = -1; 
-		}
-		
-		for (int i = 1; i < lineArray.length; i++) {
-			ingredients.add(lineArray[i]);
-		}
-		
-
-	}
-	
-	public boolean equalsRecipe(Recipe other) {
-		return cuisine != -1 && other.cuisine != -1 && ingredients.size() == other.ingredients.size() && ingredients.containsAll(other.ingredients);
-	}
-	
-	/*
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-	*/
-	
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(cuisine + " ");
-		for (String s : ingredients) {
-			sb.append(s + " ");
-		}
-		return sb.toString();
-	}
-	
-	public double jaccardDistance(Recipe other) {
-		HashSet<String> union = new HashSet();
-		union.addAll(this.ingredients);
-		union.addAll(other.ingredients);
-		double unionSize = union.size();
-		
-		double intersectSize = 0;
-		for (String ingr : this.ingredients) {
-			if (other.ingredients.contains(ingr)) {
-				intersectSize++;
-			}
-		}
-		
-		return 1 - intersectSize / unionSize;
-	}
-}
-
-interface GetDataFromThread {
-	void receiveData(int threadNum, int count);
-}
-
-class CrossValidateOnNThreads implements GetDataFromThread {
-	boolean[] completedThreads;
-	
-	ArrayList<Recipe> trainingData;
-	int k, numberOfThreads;
-	
-	double correctPredictions = 0;
-	
-	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, int k, int numberOfThreads) {
-		this.trainingData = trainingData;
-		this.k = k;
-		this.numberOfThreads = numberOfThreads;
-		completedThreads = new boolean[numberOfThreads];
-	}
-	
-	public void runAllThreads() {
-		int numberPerThread = trainingData.size() / numberOfThreads;
-		for (int i = 0; i < numberOfThreads; i++) {
-			RunSomeOfTheTests tmp = new RunSomeOfTheTests(i * numberPerThread, ((i+1) * numberPerThread - 1), trainingData, i, k, this);
-			new Thread(tmp).start();
-		}
-	}
-	
-	public synchronized void receiveData(int threadNum, int count) {
-		completedThreads[threadNum] = true;
-		correctPredictions += count;
-		
-		boolean done = true;
-		for (int i = 0; i < numberOfThreads; i++) {
-			done = done && completedThreads[i];
-		}
-		
-		if (done) {
-			System.out.println("Accuracy: " + correctPredictions / trainingData.size());
+	public static void test()  {
+		Scanner sc = new Scanner(System.in);
+		Recipe test;
+		while (sc.hasNextLine()) {
+			test = new Recipe(false, sc.nextLine());
+			System.out.println(Predicter.predictCuisine(k, trainingData, test));
 		}
 	}
 }
-
-class RunSomeOfTheTests implements Runnable {
-	int start, end, threadNum, k, correct = 0;
-	GetDataFromThread callback;
-	ArrayList<Recipe> trainingData;
-	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, int threadNum, int k, GetDataFromThread callback) {
-		this.start = start;
-		this.end = end;
-		this.k = k;
-		this.threadNum = threadNum;
-		this.trainingData = trainingData;
-		this.callback = callback;
-	}
-	@Override
-	public void run() {
-		for (int i = start; i < end; i++) {
-			long startTime, endTime, minutes, seconds;
-			startTime = System.currentTimeMillis();
-			Recipe test = trainingData.get(i);
-			int predictedCuisine = predictCuisine(test);
-			if (predictedCuisine == test.cuisine) {
-				correct++;
-				//System.out.println("i = " + i + " on thread: " + threadNum + " Correct");
-			}
-			else {
-				//System.out.println("i = " + i + " on thread: " + threadNum + " incorrect");
-			}
-			if ((i - start) % 1000 == 0) {
-				endTime = System.currentTimeMillis();
-				seconds = (endTime - startTime) / 1000;
-				//minutes = (endTime - startTime) / 1000 / 60;
-				System.out.println("Thread: " + threadNum + " found " + correct + " out of " + (i - start) + " so far" + " in " + seconds);
-				startTime = System.currentTimeMillis();
-			}
-		}
-		callback.receiveData(threadNum, correct);
-	}
-	
-	public int predictCuisine(Recipe test) {
-		Recipe[] nearestNeighbors = new Recipe[k];
-		
-		int i = 0;
-		for (int lastNearestNeighbor = 0; lastNearestNeighbor < k;) {
-			if (!test.equalsRecipe(trainingData.get(i))) {
-				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-				nearestNeighbors[lastNearestNeighbor] = trainingData.get(i);
-				moveRecipeToCorrectLocation(lastNearestNeighbor, nearestNeighbors);
-				lastNearestNeighbor++;
-			}
-			i++;
-		}
-		
-		for (; i < trainingData.size(); i++) {
-			if (!test.equalsRecipe(trainingData.get(i))) {
-				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
-				if (trainingData.get(i).distance < nearestNeighbors[k-1].distance) {
-					nearestNeighbors[k-1] = trainingData.get(i);
-					moveRecipeToCorrectLocation(k-1, nearestNeighbors);
-				}
-				
-			}
-		}
-		
-		// We now have the k nearest neighbors.
-		int[] votes = new int[8];
-		
-		for (int j = 0; j < k; j++) {
-			votes[nearestNeighbors[j].cuisine]++;
-		}
-		
-		int maxVotes = -1;
-		int predictedCuisine = -1;
-		for (int j = 0; j < 8; j++) {
-			if (votes[j] > maxVotes) {
-				maxVotes = votes[j];
-				predictedCuisine = j;
-			}
-		}
-		return predictedCuisine;
-	}
-	
-	public static void moveRecipeToCorrectLocation(int position, Recipe[] nearestNeighbors) {
-		for (int j = position; j > 0; j--) {
-			if (nearestNeighbors[j].distance < nearestNeighbors[j-1].distance) {
-				Recipe tmp = nearestNeighbors[j-1];
-				nearestNeighbors[j-1] = nearestNeighbors[j];
-				nearestNeighbors[j] = tmp;
-			}
-		}
-	}
-}
-
