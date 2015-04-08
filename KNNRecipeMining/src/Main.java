@@ -10,14 +10,18 @@ import java.util.Scanner;
 
 public class Main {
 	static ArrayList<Recipe> trainingData;
-	static HashMap<String, HashSet<Integer>> cuisineCounts;
+	// value is array from cuisineID (1 to 7) to number of occurances.
+	static HashMap<String, int[]> cuisineCounts;
 	static int k = 10;
 	static int numberOfThreads = 4;
 	
 	public static void main(String[] args) {
 		readTrainingFile();
 		getCuisineCounts();
-		
+		Recipe.cuisineCounts = cuisineCounts;
+		for (Recipe r : trainingData) {
+			r.setEntropy();
+		}
 		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, cuisineCounts, k , numberOfThreads);
 		c.runAllThreads();
 		
@@ -45,13 +49,13 @@ public class Main {
 	}
 	
 	public static void getCuisineCounts() {
-		cuisineCounts = new HashMap<String, HashSet<Integer>>();
+		cuisineCounts = new HashMap<String, int[]>();
 		for (Recipe r : trainingData) {
 			for (String ingr : r.ingredients) {
 				if (!cuisineCounts.containsKey(ingr)) {
-					cuisineCounts.put(ingr, new HashSet<Integer>());
+					cuisineCounts.put(ingr, new int[8]);
 				}
-				cuisineCounts.get(ingr).add(r.cuisine);
+				cuisineCounts.get(ingr)[r.cuisine]++;;
 			}
 		}
 	}

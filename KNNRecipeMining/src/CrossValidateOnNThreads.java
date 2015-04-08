@@ -12,11 +12,11 @@ class CrossValidateOnNThreads implements GetDataFromThread {
 	
 	ArrayList<Recipe> trainingData;
 	int k, numberOfThreads;
-	HashMap<String, HashSet<Integer>> cuisineCounts;
+	HashMap<String, int[]>  cuisineCounts;
 	
 	double correctPredictions = 0;
 	
-	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, HashMap<String, HashSet<Integer>> cuisineCounts, int k, int numberOfThreads) {
+	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, HashMap<String, int[]>  cuisineCounts, int k, int numberOfThreads) {
 		this.trainingData = trainingData;
 		this.k = k;
 		this.numberOfThreads = numberOfThreads;
@@ -51,8 +51,8 @@ class RunSomeOfTheTests implements Runnable {
 	int start, end, threadNum, k, correct = 0;
 	GetDataFromThread callback;
 	ArrayList<Recipe> trainingData;
-	HashMap<String, HashSet<Integer>> cuisineCounts;
-	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, HashMap<String, HashSet<Integer>> cuisineCounts, int threadNum, int k, GetDataFromThread callback) {
+	HashMap<String, int[]>  cuisineCounts;
+	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, HashMap<String, int[]>  cuisineCounts, int threadNum, int k, GetDataFromThread callback) {
 		this.start = start;
 		this.end = end;
 		this.k = k;
