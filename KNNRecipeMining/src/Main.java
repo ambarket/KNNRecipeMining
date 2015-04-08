@@ -3,31 +3,27 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 
 public class Main {
 	static ArrayList<Recipe> trainingData;
-	static int k;
+	static HashMap<String, HashSet<Integer>> cuisineCounts;
+	static int k, numberOfThreads;
 	
 	public static void main(String[] args) {
 		k = 10;
+		numberOfThreads = 4;
 		
 		trainingData = readTrainingFile();
+		//cuisineCounts = getCuisineCounts(trainingData);
 		
-		long startTime, endTime, duration;
-		startTime = System.nanoTime();
-		
-		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, 50, 4);
+		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, k , numberOfThreads);
 		c.runAllThreads();
 		
 		//SingleThreaded.crossValidate(k, trainingData);
-		
-		endTime = System.nanoTime();
-		duration = (endTime - startTime) / 1000000 / 1000;
-		System.out.println(duration);
 	}
 	
 	public static ArrayList<Recipe> readTrainingFile() {
@@ -52,6 +48,9 @@ public class Main {
 		return trainingRecipes;
 	}
 	
+	public static void getCuisineCounts(ArrayList<Recipe> trainingData) {
+		//HashMap<String, HashSet<Integer>> 
+	}
 	public static void test()  {
 		Scanner sc = new Scanner(System.in);
 		Recipe test;

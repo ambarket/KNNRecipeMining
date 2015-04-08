@@ -28,13 +28,13 @@ public class Predicter {
 		}
 		
 		// We now have the k nearest neighbors.
-		int[] votes = new int[8];
+		double[] votes = new double[8];
 		
 		for (int j = 0; j < k; j++) {
-			votes[nearestNeighbors[j].cuisine]++;
+			votes[nearestNeighbors[j].cuisine] += 1 / (nearestNeighbors[j].distance * nearestNeighbors[j].distance);
 		}
 		
-		int maxVotes = -1;
+		double maxVotes = -1;
 		int predictedCuisine = -1;
 		for (int j = 0; j < 8; j++) {
 			if (votes[j] > maxVotes) {
