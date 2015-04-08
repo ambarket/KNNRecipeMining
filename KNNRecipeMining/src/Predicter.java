@@ -1,14 +1,17 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class Predicter {
-	public static int predictCuisine(int k, ArrayList<Recipe> trainingData, Recipe test) {
+	public static int predictCuisine(int k, ArrayList<Recipe> trainingData, HashMap<String, HashSet<Integer>> cuisineCounts, Recipe test) {
 		Recipe[] nearestNeighbors = new Recipe[k];
 		
 		int i = 0;
 		for (int lastNearestNeighbor = 0; lastNearestNeighbor < k;) {
 			if (!test.equalsRecipe(trainingData.get(i))) {
-				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
+				//trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
+				trainingData.get(i).distance = trainingData.get(i).customDistance01(cuisineCounts, test);
 				nearestNeighbors[lastNearestNeighbor] = trainingData.get(i);
 				moveRecipeToCorrectLocation(lastNearestNeighbor, nearestNeighbors);
 				lastNearestNeighbor++;
@@ -18,7 +21,8 @@ public class Predicter {
 		
 		for (; i < trainingData.size(); i++) {
 			if (!test.equalsRecipe(trainingData.get(i))) {
-				trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
+				//trainingData.get(i).distance = trainingData.get(i).jaccardDistance(test);
+				trainingData.get(i).distance = trainingData.get(i).customDistance01(cuisineCounts, test);
 				if (trainingData.get(i).distance < nearestNeighbors[k-1].distance) {
 					nearestNeighbors[k-1] = trainingData.get(i);
 					moveRecipeToCorrectLocation(k-1, nearestNeighbors);

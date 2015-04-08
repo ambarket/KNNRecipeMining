@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-
+/*
 public class SingleThreaded {
 	
 	public static void crossValidate(int k, ArrayList<Recipe> trainingData) {
@@ -25,3 +25,4 @@ public class SingleThreaded {
 	}
 	
 }
+*/

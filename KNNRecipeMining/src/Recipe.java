@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.HashSet;
 
 class Recipe {
@@ -36,7 +37,7 @@ class Recipe {
 	}
 	
 	public double jaccardDistance(Recipe other) {
-		HashSet<String> union = new HashSet();
+		HashSet<String> union = new HashSet<String>();
 		union.addAll(this.ingredients);
 		union.addAll(other.ingredients);
 		double unionSize = union.size();
@@ -49,5 +50,28 @@ class Recipe {
 		}
 		
 		return 1 - intersectSize / unionSize;
+	}
+	
+	public double customDistance01(HashMap<String, HashSet<Integer>> cuisineCounts, Recipe other) {
+		HashSet<String> union = new HashSet<String>();
+		union.addAll(this.ingredients);
+		union.addAll(other.ingredients);
+		
+		double unionCuisineSum = 0;
+		double intersectCuisineSum  = 0;
+		for (String ingr : this.ingredients) {
+			if (other.ingredients.contains(ingr)) {
+				double tmp = cuisineCounts.get(ingr).size() / 8.0/*16.000000001*/;
+				intersectCuisineSum += (1 - (tmp));
+			}
+		}
+		
+		for (String ingr : union) {
+			double tmp = cuisineCounts.get(ingr).size() / 8.0/*16.000000001*/;
+			unionCuisineSum += (1 - (tmp));
+			//System.out.println(cuisineCounts.get(ingr).size());
+		}
+
+		return 1 - intersectCuisineSum / unionCuisineSum;
 	}
 }

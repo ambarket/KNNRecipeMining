@@ -11,25 +11,23 @@ import java.util.Scanner;
 public class Main {
 	static ArrayList<Recipe> trainingData;
 	static HashMap<String, HashSet<Integer>> cuisineCounts;
-	static int k, numberOfThreads;
+	static int k = 10;
+	static int numberOfThreads = 4;
 	
 	public static void main(String[] args) {
-		k = 10;
-		numberOfThreads = 4;
+		readTrainingFile();
+		getCuisineCounts();
 		
-		trainingData = readTrainingFile();
-		//cuisineCounts = getCuisineCounts(trainingData);
-		
-		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, k , numberOfThreads);
+		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, cuisineCounts, k , numberOfThreads);
 		c.runAllThreads();
 		
 		//SingleThreaded.crossValidate(k, trainingData);
 	}
 	
-	public static ArrayList<Recipe> readTrainingFile() {
+	public static void readTrainingFile() {
 		String trainingFile = "training-data.txt";
 		
-		ArrayList<Recipe> trainingRecipes = new ArrayList<Recipe>();
+		trainingData = new ArrayList<Recipe>();
 
 		try {
 			// use FileWriter constructor that specifies open for appending
@@ -38,25 +36,32 @@ public class Main {
 			String line;
 
 			while ((line = br.readLine()) != null) {
-				trainingRecipes.add(new Recipe(true, line));
+				trainingData.add(new Recipe(true, line));
 			}
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		return trainingRecipes;
 	}
 	
-	public static void getCuisineCounts(ArrayList<Recipe> trainingData) {
-		//HashMap<String, HashSet<Integer>> 
+	public static void getCuisineCounts() {
+		cuisineCounts = new HashMap<String, HashSet<Integer>>();
+		for (Recipe r : trainingData) {
+			for (String ingr : r.ingredients) {
+				if (!cuisineCounts.containsKey(ingr)) {
+					cuisineCounts.put(ingr, new HashSet<Integer>());
+				}
+				cuisineCounts.get(ingr).add(r.cuisine);
+			}
+		}
 	}
+	
 	public static void test()  {
 		Scanner sc = new Scanner(System.in);
 		Recipe test;
 		while (sc.hasNextLine()) {
 			test = new Recipe(false, sc.nextLine());
-			System.out.println(Predicter.predictCuisine(k, trainingData, test));
+			System.out.println(Predicter.predictCuisine(k, trainingData, cuisineCounts, test));
 		}
 	}
 }

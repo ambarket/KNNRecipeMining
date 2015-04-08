@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 interface GetDataFromThread {
@@ -10,20 +12,22 @@ class CrossValidateOnNThreads implements GetDataFromThread {
 	
 	ArrayList<Recipe> trainingData;
 	int k, numberOfThreads;
+	HashMap<String, HashSet<Integer>> cuisineCounts;
 	
 	double correctPredictions = 0;
 	
-	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, int k, int numberOfThreads) {
+	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, HashMap<String, HashSet<Integer>> cuisineCounts, int k, int numberOfThreads) {
 		this.trainingData = trainingData;
 		this.k = k;
 		this.numberOfThreads = numberOfThreads;
 		completedThreads = new boolean[numberOfThreads];
+		this.cuisineCounts = cuisineCounts;
 	}
 	
 	public void runAllThreads() {
 		int numberPerThread = trainingData.size() / numberOfThreads;
 		for (int i = 0; i < numberOfThreads; i++) {
-			RunSomeOfTheTests tmp = new RunSomeOfTheTests(i * numberPerThread, ((i+1) * numberPerThread - 1), trainingData, i, k, this);
+			RunSomeOfTheTests tmp = new RunSomeOfTheTests(i * numberPerThread, ((i+1) * numberPerThread - 1), trainingData, cuisineCounts, i, k, this);
 			new Thread(tmp).start();
 		}
 	}
@@ -47,13 +51,15 @@ class RunSomeOfTheTests implements Runnable {
 	int start, end, threadNum, k, correct = 0;
 	GetDataFromThread callback;
 	ArrayList<Recipe> trainingData;
-	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, int threadNum, int k, GetDataFromThread callback) {
+	HashMap<String, HashSet<Integer>> cuisineCounts;
+	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, HashMap<String, HashSet<Integer>> cuisineCounts, int threadNum, int k, GetDataFromThread callback) {
 		this.start = start;
 		this.end = end;
 		this.k = k;
 		this.threadNum = threadNum;
 		this.trainingData = trainingData;
 		this.callback = callback;
+		this.cuisineCounts = cuisineCounts;
 	}
 	@Override
 	public void run() {
@@ -61,7 +67,7 @@ class RunSomeOfTheTests implements Runnable {
 		for (int i = start; i < end; i++) {
 			startTime = System.currentTimeMillis();
 			Recipe test = trainingData.get(i);
-			int predictedCuisine = Predicter.predictCuisine(k, trainingData, test);
+			int predictedCuisine = Predicter.predictCuisine(k, trainingData, cuisineCounts, test);
 			if (predictedCuisine == test.cuisine) {
 				correct++;
 				//System.out.println("i = " + i + " on thread: " + threadNum + " Correct");
@@ -69,7 +75,7 @@ class RunSomeOfTheTests implements Runnable {
 			else {
 				//System.out.println("i = " + i + " on thread: " + threadNum + " incorrect");
 			}
-			if ((i - start + 1) % 1000 == 0) {
+			if ((i - start + 1) % 100 == 0) {
 				endTime = System.currentTimeMillis();
 				seconds = (endTime - startTime) / 1000;
 				//minutes = (endTime - startTime) / 1000 / 60;
