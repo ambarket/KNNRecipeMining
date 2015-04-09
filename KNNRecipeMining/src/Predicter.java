@@ -4,11 +4,11 @@ import java.util.HashSet;
 
 public class Predicter {
     
-    public static int predictCuisine(Recipe test) {
+    public static int predictCuisine(Recipe test, double[] distanceSpaceForThisThread) {
 	// Store the index of the neighbors in the trainingData, can't use recipe itself 
 	//	and store distance inside recipe because of multithreading.
 	int[] nearestNeighbors = new int[Main.k]; 
-	double[] distances = new double[Main.trainingData.size()];
+	double[] distances = distanceSpaceForThisThread; //new double[Main.trainingData.size()];
 	int i = 0;
 	// Fill up the nearest neighbors first
 	for (int nearestNeighborsSize = 0; nearestNeighborsSize < Main.k;) {

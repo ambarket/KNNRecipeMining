@@ -18,7 +18,7 @@ public class Main {
 	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
-	static DistanceFunction distanceFunction = DistanceFunction.JACCARD;
+	static DistanceFunction distanceFunction = DistanceFunction.CUSTOM01;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
 	
 	
@@ -68,11 +68,12 @@ public class Main {
 	}
 	
 	public static void runAgainstTestSet()  {
-		Scanner sc = new Scanner(System.in);
-		Recipe test;
-		while (sc.hasNextLine()) {
-			test = new Recipe(false, sc.nextLine());
-			System.out.println(Predicter.predictCuisine(test));
-		}
+	    	double[] distanceSpaceForThisThread = new double[trainingData.size()];
+          	Scanner sc = new Scanner(System.in);
+          	Recipe test;
+          	while (sc.hasNextLine()) {
+          		test = new Recipe(false, sc.nextLine());
+          		System.out.println(Predicter.predictCuisine(test, distanceSpaceForThisThread));
+          	}
 	}
 }
