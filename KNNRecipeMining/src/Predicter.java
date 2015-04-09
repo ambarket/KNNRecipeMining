@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Predicter {
-    
     public static int predictCuisine(Recipe test, double[] distanceSpaceForThisThread) {
 	// Store the index of the neighbors in the trainingData, can't use recipe itself 
 	//	and store distance inside recipe because of multithreading.

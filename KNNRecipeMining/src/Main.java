@@ -25,6 +25,9 @@ public class Main {
 	
 	
 	public static void main(String[] args) {
+		long startTime, endTime, seconds;
+		startTime = System.currentTimeMillis();
+
 	    	setTrainingData();
 		setCuisineCounts();
 		setTrainingDataDistanceMatrix();
@@ -32,11 +35,19 @@ public class Main {
 		for (Recipe r : trainingData) {
 			r.setEntropy();
 		}
-		//CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
+		CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
+		endTime = System.currentTimeMillis();
+		seconds = (endTime - startTime) / 1000;
+		System.out.println("Read file and preprocessed in " + seconds + " seconds");
 		
-		//double accuracy = crossValidator.runAndReturnResult();
-		//System.out.println("Accuracy: " + accuracy);
-		SingleThreaded.crossValidate();
+		startTime = System.currentTimeMillis();
+		double accuracy = crossValidator.runAndReturnResult();
+		System.out.println("Accuracy: " + accuracy);
+		
+		endTime = System.currentTimeMillis();
+		seconds = (endTime - startTime) / 1000;
+		System.out.println("Ran CrossValidation in " + seconds + " seconds");
+		//SingleThreaded.crossValidate();
 		
 	}
 	
