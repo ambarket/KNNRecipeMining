@@ -64,7 +64,7 @@ class Recipe {
 	    case CUSTOM01:
 	      return customDistance01(other);
 	    case CUSTOM02:
-	      return customDistance01(other);
+	      return customDistance02(other);
 	    default:
 	      System.out.println("ERROR: Invalid distance function selection.");
 	      return Float.MAX_VALUE;

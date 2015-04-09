@@ -6,7 +6,7 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
     int correctPredictions = 0;
 
     // Note: This method is a blocking call and will not return until all
-    // thready have finished. 
+    // threads have finished. 
     public double runAndReturnResult() {
 	return runAndReturnResult(Main.trainingData.size());
     }
@@ -33,6 +33,7 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
 	    threads[threadNum] = new Thread(tmp);
 	    threads[threadNum].start();
 	}
+	
 	for (Thread t : threads) {
 	    try {
 		t.join();
@@ -41,12 +42,11 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
 		e.printStackTrace();
 	    }
 	}
+	
 	// At this point all threads have completed, thus
 	// this.correctPredictions will be set to the total number
 	// of correctPredictions.
-	double accuracy = ((double) correctPredictions) / Main.trainingData.size();
-	System.out.println("Accuracy: " + accuracy);
-	return accuracy;
+	return ((double) correctPredictions) / Main.trainingData.size();
     }
 
     public synchronized void receiveData(int threadNum, int correctCount) {
@@ -69,12 +69,13 @@ class CrossValidationRunnable implements Runnable {
 
     @Override
     public void run() {
+	double[] distanceSpaceForThisThread = new double[Main.trainingData.size()];
 	long startTime, endTime, seconds;
 	startTime = System.currentTimeMillis();
 	for (int i = start; i < end; i++) {
 
 	    Recipe test = Main.trainingData.get(i);
-	    int predictedCuisine = Predicter.predictCuisine(test);
+	    int predictedCuisine = Predicter.predictCuisine(test, distanceSpaceForThisThread);
 	    if (predictedCuisine == test.cuisine) {
 		correct++;
 	    }
