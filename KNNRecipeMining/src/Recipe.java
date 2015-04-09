@@ -57,7 +57,7 @@ class Recipe {
 	}
 	
 	// One public distance function used in the rest of the code, add / comment out the return statements as needed.
-	public double getDistance(Recipe other) {
+	public float getDistance(Recipe other) {
 	  switch (Main.distanceFunction) {
 	    case JACCARD: 
 	      return jaccardDistance(other);
@@ -67,17 +67,17 @@ class Recipe {
 	      return customDistance01(other);
 	    default:
 	      System.out.println("ERROR: Invalid distance function selection.");
-	      return Double.MAX_VALUE;
+	      return Float.MAX_VALUE;
 	  }
 	}
 	
-	private double jaccardDistance(Recipe other) {
+	private float jaccardDistance(Recipe other) {
 		HashSet<String> union = new HashSet<String>();
 		union.addAll(this.ingredients);
 		union.addAll(other.ingredients);
-		double unionSize = union.size();
+		float unionSize = union.size();
 		
-		double intersectSize = 0;
+		float intersectSize = 0;
 		for (String ingr : this.ingredients) {
 			if (other.ingredients.contains(ingr)) {
 				intersectSize++;
@@ -87,13 +87,13 @@ class Recipe {
 		return 1 - intersectSize / unionSize;
 	}
 	
-	private double customDistance01(Recipe other) {
+	private float customDistance01(Recipe other) {
 		HashSet<String> union = new HashSet<String>();
 		union.addAll(this.ingredients);
 		union.addAll(other.ingredients);
 		
-		double unionCuisineSum = 0;
-		double intersectCuisineSum  = 0;
+		float unionCuisineSum = 0;
+		float intersectCuisineSum  = 0;
 		for (String ingr : this.ingredients) {
 			if (other.ingredients.contains(ingr)) {
 				int numOfCuisines = 0;
@@ -122,8 +122,8 @@ class Recipe {
 		return 1 - intersectCuisineSum / unionCuisineSum;
 	}
 	// This is terrible ~.60%
-	private double customDistance02(Recipe other) {
-		double intersectCuisineSum  = 0;
+	private float customDistance02(Recipe other) {
+	    	float intersectCuisineSum  = 0;
 		double intersectSize  = 0;
 		for (String ingr : this.ingredients) {
 			if (other.ingredients.contains(ingr)) {

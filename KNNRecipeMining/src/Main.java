@@ -21,10 +21,13 @@ public class Main {
 	static DistanceFunction distanceFunction = DistanceFunction.JACCARD;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
 	
+	static float[][] trainingDataDistanceMatrix;
+	
 	
 	public static void main(String[] args) {
-	    setTrainingData();
+	    	setTrainingData();
 		setCuisineCounts();
+		setTrainingDataDistanceMatrix();
 
 		for (Recipe r : trainingData) {
 			r.setEntropy();
@@ -65,6 +68,15 @@ public class Main {
 				cuisineCounts.get(ingr)[r.cuisine]++;;
 			}
 		}
+	}
+	
+	public static void setTrainingDataDistanceMatrix() {
+	    trainingDataDistanceMatrix = new float[trainingData.size()][trainingData.size()];
+	    for (int i = 0; i < trainingData.size(); i++) {
+		    for (int j = 0; i < trainingData.size(); i++) {
+			trainingDataDistanceMatrix[i][j] = trainingData.get(i).getDistance(trainingData.get(j));
+		    }
+	    }
 	}
 	
 	public static void runAgainstTestSet()  {
