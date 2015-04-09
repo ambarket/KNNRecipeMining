@@ -18,7 +18,7 @@ public class Main {
 	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
-	static DistanceFunction distanceFunction = DistanceFunction.CUSTOM01;
+	static DistanceFunction distanceFunction = DistanceFunction.JACCARD;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
 	
 	
@@ -29,9 +29,11 @@ public class Main {
 		for (Recipe r : trainingData) {
 			r.setEntropy();
 		}
-		CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
-		double accuracy = crossValidator.runAndReturnResult();
-		System.out.println("Accuracy: " + accuracy);
+		//CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
+		
+		//double accuracy = crossValidator.runAndReturnResult();
+		//System.out.println("Accuracy: " + accuracy);
+		SingleThreaded.crossValidate();
 		
 	}
 	

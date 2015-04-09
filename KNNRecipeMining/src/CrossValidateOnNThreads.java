@@ -33,6 +33,7 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
 	    threads[threadNum] = new Thread(tmp);
 	    threads[threadNum].start();
 	}
+	
 	for (Thread t : threads) {
 	    try {
 		t.join();
@@ -41,6 +42,7 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
 		e.printStackTrace();
 	    }
 	}
+	
 	// At this point all threads have completed, thus
 	// this.correctPredictions will be set to the total number
 	// of correctPredictions.
