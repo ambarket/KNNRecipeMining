@@ -1,89 +1,93 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
-
-interface GetDataFromThread {
-	void receiveData(int threadNum, int count);
+interface CrossValidationRunnableListener {
+    void receiveData(int threadNum, int count);
 }
 
-class CrossValidateOnNThreads implements GetDataFromThread {
-	boolean[] completedThreads;
-	
-	ArrayList<Recipe> trainingData;
-	int k, numberOfThreads;
-	HashMap<String, int[]>  cuisineCounts;
-	
-	double correctPredictions = 0;
-	
-	public CrossValidateOnNThreads(ArrayList<Recipe> trainingData, HashMap<String, int[]>  cuisineCounts, int k, int numberOfThreads) {
-		this.trainingData = trainingData;
-		this.k = k;
-		this.numberOfThreads = numberOfThreads;
-		completedThreads = new boolean[numberOfThreads];
-		this.cuisineCounts = cuisineCounts;
+class CrossValidateOnNThreads implements CrossValidationRunnableListener {
+    int correctPredictions = 0;
+
+    // Note: This method is a blocking call and will not return until all
+    // thready have finished. 
+    public double runAndReturnResult() {
+	return runAndReturnResult(Main.trainingData.size());
+    }
+
+    // endIndex allows running crossValidation on 
+    // only the 0 to endIndex, instead of the entire array of training 
+    // recipes. Each recipe is still predicted using the entire training 
+    // data set, it will just only try to leave out and predict the recipes 
+    // from 0 to endIndex. If endIndex is <= 0 OR endIndex > the size of the 
+    // trainingData set, the entire set will be used
+    public double runAndReturnResult(int endIndex) {
+	if (endIndex <= 0 || endIndex > Main.trainingData.size()) {
+	    endIndex = Main.trainingData.size();
 	}
-	
-	public void runAllThreads() {
-		int numberPerThread = trainingData.size() / numberOfThreads;
-		for (int i = 0; i < numberOfThreads; i++) {
-			RunSomeOfTheTests tmp = new RunSomeOfTheTests(i * numberPerThread, ((i+1) * numberPerThread - 1), trainingData, cuisineCounts, i, k, this);
-			new Thread(tmp).start();
-		}
+	int numberPerThread = endIndex / Main.numberOfThreads;
+
+	Thread[] threads = new Thread[Main.numberOfThreads];
+
+	for (int threadNum = 0; threadNum < Main.numberOfThreads; threadNum++) {
+	    int threadStartIndex = threadNum * numberPerThread;
+	    int threadEndIndex = (threadNum + 1) * numberPerThread - 1;
+	    CrossValidationRunnable tmp = new CrossValidationRunnable(
+		    threadNum, threadStartIndex, threadEndIndex, this);
+	    threads[threadNum] = new Thread(tmp);
+	    threads[threadNum].start();
 	}
-	
-	public synchronized void receiveData(int threadNum, int count) {
-		completedThreads[threadNum] = true;
-		correctPredictions += count;
-		
-		boolean done = true;
-		for (int i = 0; i < numberOfThreads; i++) {
-			done = done && completedThreads[i];
-		}
-		
-		if (done) {
-			System.out.println("Accuracy: " + correctPredictions / trainingData.size());
-		}
+	for (Thread t : threads) {
+	    try {
+		t.join();
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
 	}
+	// At this point all threads have completed, thus
+	// this.correctPredictions will be set to the total number
+	// of correctPredictions.
+	double accuracy = ((double) correctPredictions) / Main.trainingData.size();
+	System.out.println("Accuracy: " + accuracy);
+	return accuracy;
+    }
+
+    public synchronized void receiveData(int threadNum, int correctCount) {
+	System.out.println("Received data from thread #" + threadNum);
+	correctPredictions += correctCount;
+    }
 }
 
-class RunSomeOfTheTests implements Runnable {
-	int start, end, threadNum, k, correct = 0;
-	GetDataFromThread callback;
-	ArrayList<Recipe> trainingData;
-	HashMap<String, int[]>  cuisineCounts;
-	public RunSomeOfTheTests(int start, int end, ArrayList<Recipe> trainingData, HashMap<String, int[]>  cuisineCounts, int threadNum, int k, GetDataFromThread callback) {
-		this.start = start;
-		this.end = end;
-		this.k = k;
-		this.threadNum = threadNum;
-		this.trainingData = trainingData;
-		this.callback = callback;
-		this.cuisineCounts = cuisineCounts;
+class CrossValidationRunnable implements Runnable {
+    int start, end, threadNum, correct = 0;
+    CrossValidationRunnableListener listener;
+
+    public CrossValidationRunnable(int threadNum, int start, int end,
+	    CrossValidationRunnableListener listener) {
+	this.threadNum = threadNum;
+	this.start = start;
+	this.end = end;
+	this.listener = listener;
+    }
+
+    @Override
+    public void run() {
+	long startTime, endTime, seconds;
+	startTime = System.currentTimeMillis();
+	for (int i = start; i < end; i++) {
+
+	    Recipe test = Main.trainingData.get(i);
+	    int predictedCuisine = Predicter.predictCuisine(test);
+	    if (predictedCuisine == test.cuisine) {
+		correct++;
+	    }
+	    if ((i - start + 1) % 500 == 0) {
+		endTime = System.currentTimeMillis();
+		seconds = (endTime - startTime) / 1000;
+		// minutes = (endTime - startTime) / 1000 / 60;
+		System.out.println("Thread: " + threadNum + " found " + correct
+			+ " out of " + (i - start) + " so far" + " in "
+			+ seconds + " seconds, Accuracy: " + (double) correct
+			/ (i - start));
+	    }
 	}
-	@Override
-	public void run() {
-		long startTime, endTime, minutes, seconds;
-		for (int i = start; i < end; i++) {
-			startTime = System.currentTimeMillis();
-			Recipe test = trainingData.get(i);
-			int predictedCuisine = Predicter.predictCuisine(k, trainingData, cuisineCounts, test);
-			if (predictedCuisine == test.cuisine) {
-				correct++;
-				//System.out.println("i = " + i + " on thread: " + threadNum + " Correct");
-			}
-			else {
-				//System.out.println("i = " + i + " on thread: " + threadNum + " incorrect");
-			}
-			if ((i - start + 1) % 100 == 0) {
-				endTime = System.currentTimeMillis();
-				seconds = (endTime - startTime) / 1000;
-				//minutes = (endTime - startTime) / 1000 / 60;
-				System.out.println("Thread: " + threadNum + " found " + correct + " out of " + (i - start) + " so far" + " in " + seconds + " Accuracy: " + (double)correct/(i - start));
-				startTime = System.currentTimeMillis();
-			}
-		}
-		callback.receiveData(threadNum, correct);
-	}
-	
+	listener.receiveData(threadNum, correct);
+    }
 }

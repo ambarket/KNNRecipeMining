@@ -4,31 +4,38 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Scanner;
 
+enum DistanceFunction { JACCARD, CUSTOM01, CUSTOM02 }
+enum VoteWeightFunction { DISTANCE, ENTROPY }
 
 public class Main {
+    // All other classes just use these static variable to avoid passing a bunch of arguments around.
 	static ArrayList<Recipe> trainingData;
 	// value is array from cuisineID (1 to 7) to number of occurances.
 	static HashMap<String, int[]> cuisineCounts;
+	
+	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
+	static DistanceFunction distanceFunction = DistanceFunction.JACCARD;
+	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
+	
 	
 	public static void main(String[] args) {
-		readTrainingFile();
-		getCuisineCounts();
-		Recipe.cuisineCounts = cuisineCounts;
+	    setTrainingData();
+		setCuisineCounts();
+
 		for (Recipe r : trainingData) {
 			r.setEntropy();
 		}
-		CrossValidateOnNThreads c = new CrossValidateOnNThreads(trainingData, cuisineCounts, k , numberOfThreads);
-		c.runAllThreads();
+		CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
+		double accuracy = crossValidator.runAndReturnResult();
+		System.out.println("Accuracy: " + accuracy);
 		
-		//SingleThreaded.crossValidate(k, trainingData);
 	}
 	
-	public static void readTrainingFile() {
+	public static void setTrainingData() {
 		String trainingFile = "training-data.txt";
 		
 		trainingData = new ArrayList<Recipe>();
@@ -48,7 +55,7 @@ public class Main {
 		}
 	}
 	
-	public static void getCuisineCounts() {
+	public static void setCuisineCounts() {
 		cuisineCounts = new HashMap<String, int[]>();
 		for (Recipe r : trainingData) {
 			for (String ingr : r.ingredients) {
@@ -60,12 +67,12 @@ public class Main {
 		}
 	}
 	
-	public static void test()  {
+	public static void runAgainstTestSet()  {
 		Scanner sc = new Scanner(System.in);
 		Recipe test;
 		while (sc.hasNextLine()) {
 			test = new Recipe(false, sc.nextLine());
-			System.out.println(Predicter.predictCuisine(k, trainingData, cuisineCounts, test));
+			System.out.println(Predicter.predictCuisine(test));
 		}
 	}
 }

@@ -2,10 +2,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 class Recipe {
-	public double distance; // Only relevant in the context of a particular run of predictCuisine.
 	public int cuisine;
 	HashSet<String> ingredients;
-	static HashMap<String, int[]> cuisineCounts;
 	public double cuisineEntropy;
 	
 	public Recipe(boolean training, String line) {
@@ -28,11 +26,11 @@ class Recipe {
 		for (String ingr :ingredients) {
 			double totalOccurances = 0;
 			for (int i = 1; i < 8; i++) {
-				totalOccurances += cuisineCounts.get(ingr)[i];
+				totalOccurances += Main.cuisineCounts.get(ingr)[i];
 			}
 			double sumOfProb = 0;
 			for (int i = 1; i < 8; i++) {
-				double prob = cuisineCounts.get(ingr)[i] / totalOccurances;
+				double prob = Main.cuisineCounts.get(ingr)[i] / totalOccurances;
 				if (prob != 0) {
 					sumOfProb += prob * ((prob != 0) ? Math.log(prob) : 0);
 				}
@@ -58,7 +56,22 @@ class Recipe {
 		return sb.toString();
 	}
 	
-	public double jaccardDistance(Recipe other) {
+	// One public distance function used in the rest of the code, add / comment out the return statements as needed.
+	public double getDistance(Recipe other) {
+	  switch (Main.distanceFunction) {
+	    case JACCARD: 
+	      return jaccardDistance(other);
+	    case CUSTOM01:
+	      return customDistance01(other);
+	    case CUSTOM02:
+	      return customDistance01(other);
+	    default:
+	      System.out.println("ERROR: Invalid distance function selection.");
+	      return Double.MAX_VALUE;
+	  }
+	}
+	
+	private double jaccardDistance(Recipe other) {
 		HashSet<String> union = new HashSet<String>();
 		union.addAll(this.ingredients);
 		union.addAll(other.ingredients);
@@ -74,7 +87,7 @@ class Recipe {
 		return 1 - intersectSize / unionSize;
 	}
 	
-	public double customDistance01(Recipe other) {
+	private double customDistance01(Recipe other) {
 		HashSet<String> union = new HashSet<String>();
 		union.addAll(this.ingredients);
 		union.addAll(other.ingredients);
@@ -85,7 +98,7 @@ class Recipe {
 			if (other.ingredients.contains(ingr)) {
 				int numOfCuisines = 0;
 				for (int i = 1; i < 8; i++) {
-					if (cuisineCounts.get(ingr)[i] > 0) {
+					if (Main.cuisineCounts.get(ingr)[i] > 0) {
 						numOfCuisines++;
 					}
 				}
@@ -97,7 +110,7 @@ class Recipe {
 		for (String ingr : union) {
 			int numOfCuisines = 0;
 			for (int i = 1; i < 8; i++) {
-				if (cuisineCounts.get(ingr)[i] > 0) {
+				if (Main.cuisineCounts.get(ingr)[i] > 0) {
 					numOfCuisines++;
 				}
 			}
@@ -109,7 +122,7 @@ class Recipe {
 		return 1 - intersectCuisineSum / unionCuisineSum;
 	}
 	// This is terrible ~.60%
-	public double customDistance02(Recipe other) {
+	private double customDistance02(Recipe other) {
 		double intersectCuisineSum  = 0;
 		double intersectSize  = 0;
 		for (String ingr : this.ingredients) {
@@ -117,11 +130,11 @@ class Recipe {
 				intersectSize++;
 				double totalOccurances = 0;
 				for (int i = 1; i < 8; i++) {
-					totalOccurances += cuisineCounts.get(ingr)[i];
+					totalOccurances += Main.cuisineCounts.get(ingr)[i];
 				}
 				double sumOfProb = 0;
 				for (int i = 1; i < 8; i++) {
-					double prob = cuisineCounts.get(ingr)[i] / totalOccurances;
+					double prob = Main.cuisineCounts.get(ingr)[i] / totalOccurances;
 					if (prob != 0) {
 						sumOfProb += prob * ((prob != 0) ? Math.log(prob) : 0);
 					}
