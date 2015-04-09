@@ -4,11 +4,11 @@ import java.util.HashSet;
 
 public class Predicter {
     
-    public static int predictCuisine(Recipe test) {
+    public static int predictCuisine(Recipe test, double[] distanceSpaceForThisThread) {
 	// Store the index of the neighbors in the trainingData, can't use recipe itself 
 	//	and store distance inside recipe because of multithreading.
 	int[] nearestNeighbors = new int[Main.k]; 
-	double[] distances = new double[Main.trainingData.size()];
+	double[] distances = distanceSpaceForThisThread; //new double[Main.trainingData.size()];
 	int i = 0;
 	// Fill up the nearest neighbors first
 	for (int nearestNeighborsSize = 0; nearestNeighborsSize < Main.k;) {
@@ -60,73 +60,9 @@ public class Predicter {
 	return predictedCuisine;
     }
     
-    public static int predictCuisineDuringCrossValidation(int testIndex) {
-	// Store the index of the neighbors in the trainingData, can't use recipe itself 
-	//	and store distance inside recipe because of multithreading.
-	int[] nearestNeighbors = new int[Main.k]; 
-	int i = 0;
-	// Fill up the nearest neighbors first
-	for (int nearestNeighborsSize = 0; nearestNeighborsSize < Main.k;) {
-	    if (testIndex != i) {
-		nearestNeighbors[nearestNeighborsSize] = i;
-		moveRecipeToCorrectLocationDuringCrossValidation(nearestNeighborsSize, nearestNeighbors);
-		nearestNeighborsSize++;
-	    }
-	    i++;
-	}
-
-	// Now go through the rest of the training recipes, keep track of the k
-	// nearest neighbors
-	for (; i < Main.trainingData.size(); i++) {
-	    if (testIndex != i) {
-		distances[i] = Main.trainingDataDistanceMatrix[i][testIndex]; 
-		if (Main.trainingDataDistanceMatrix[i][testIndex] < Main.trainingDataDistanceMatrix[nearestNeighbors[Main.k - 1]][testIndex]) {
-		    nearestNeighbors[Main.k - 1] = i;
-		    moveRecipeToCorrectLocationDuringCrossValidation(Main.k - 1, nearestNeighbors);
-		}
-	    }
-	}
-
-	// We now have the k nearest neighbors, tally the votes.
-	double[] votes = null;
-
-	switch (Main.voteWeightFunction) {
-	case DISTANCE:
-	    votes = getVotesWeightedByDistance(nearestNeighbors, distances);
-	    break;
-	case ENTROPY:
-	    votes = getVotesWeightedByEntropy(nearestNeighbors, distances);
-	    break;
-	default:
-	    System.out.println("ERROR: Invalid vote weight function selection");
-	    break;
-	}
-
-	double maxVotes = -1;
-	int predictedCuisine = -1;
-	for (int j = 1; j < 8; j++) {
-	    if (votes[j] > maxVotes) {
-		maxVotes = votes[j];
-		predictedCuisine = j;
-	    }
-	}
-	return predictedCuisine;
-    }
-    
 	
     // Keep in ascending order by distance
     private static void moveRecipeToCorrectLocation(int positionToSort, int[] nearestNeighbors, double[] distances) {
-	for (int j = positionToSort; j > 0; j--) {
-	    if (distances[nearestNeighbors[j]] < distances[nearestNeighbors[j - 1]]) {
-		int tmp = nearestNeighbors[j - 1];
-		nearestNeighbors[j - 1] = nearestNeighbors[j];
-		nearestNeighbors[j] = tmp;
-	    }
-	}
-    }
-    
-    // Keep in ascending order by distance
-    private static void moveRecipeToCorrectLocationDuringCrossValidation(int positionToSort, int[] nearestNeighbors) {
 	for (int j = positionToSort; j > 0; j--) {
 	    if (distances[nearestNeighbors[j]] < distances[nearestNeighbors[j - 1]]) {
 		int tmp = nearestNeighbors[j - 1];
