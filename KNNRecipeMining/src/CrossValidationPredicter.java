@@ -1,4 +1,4 @@
-
+// Theres something wrong here.
 public class CrossValidationPredicter {
   
         public static int predictCuisine(int testIndex) {
@@ -9,9 +9,9 @@ public class CrossValidationPredicter {
     	// Fill up the nearest neighbors first
     	for (int nearestNeighborsSize = 0; nearestNeighborsSize < Main.k;) {
     	    if (testIndex != i) {
-    		nearestNeighbors[nearestNeighborsSize] = i;
-    		moveRecipeToCorrectLocation(nearestNeighborsSize, nearestNeighbors, testIndex);
-    		nearestNeighborsSize++;
+	    		nearestNeighbors[nearestNeighborsSize] = i;
+	    		moveRecipeToCorrectLocation(nearestNeighborsSize, nearestNeighbors, testIndex);
+	    		nearestNeighborsSize++;
     	    }
     	    i++;
     	}
@@ -20,10 +20,28 @@ public class CrossValidationPredicter {
     	// nearest neighbors
     	for (; i < Main.trainingData.size(); i++) {
     	    if (testIndex != i) {
-    		if (Main.trainingDataDistanceMatrix[i][testIndex] < Main.trainingDataDistanceMatrix[nearestNeighbors[Main.k - 1]][testIndex]) {
-    		    nearestNeighbors[Main.k - 1] = i;
-    		    moveRecipeToCorrectLocation(Main.k - 1, nearestNeighbors, testIndex);
-    		}
+    	    	boolean condition;
+    	    	if (testIndex < i) {
+    	    		if (testIndex < nearestNeighbors[Main.k - 1]) {
+        	    		condition = Main.trainingDataDistanceMatrix[i][testIndex] < Main.trainingDataDistanceMatrix[nearestNeighbors[Main.k - 1]][testIndex];
+    	    		}
+    	    		else {
+        	    		condition = Main.trainingDataDistanceMatrix[i][testIndex] < Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[Main.k - 1]];
+    	    		}
+
+    	    	}
+    	    	else {
+    	    		if (testIndex < nearestNeighbors[Main.k - 1]) {
+        	    		condition = Main.trainingDataDistanceMatrix[testIndex][i] < Main.trainingDataDistanceMatrix[nearestNeighbors[Main.k - 1]][testIndex];
+    	    		}
+    	    		else {
+        	    		condition = Main.trainingDataDistanceMatrix[testIndex][i] < Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[Main.k - 1]];
+    	    		}
+    	    	}
+	    		if (condition) {
+	    		    nearestNeighbors[Main.k - 1] = i;
+	    		    moveRecipeToCorrectLocation(Main.k - 1, nearestNeighbors, testIndex);
+	    		}
     	    }
     	}
 
@@ -57,7 +75,24 @@ public class CrossValidationPredicter {
         // Keep in ascending order by distance
         private static void moveRecipeToCorrectLocation(int positionToSort, int[] nearestNeighbors, int testIndex) {
         	for (int j = positionToSort; j > 0; j--) {
-        	    if (Main.trainingDataDistanceMatrix[nearestNeighbors[j]][testIndex] < Main.trainingDataDistanceMatrix[nearestNeighbors[j - 1]][testIndex]) {
+    	    	boolean condition;
+    	    	if (testIndex < nearestNeighbors[j]) {
+    	    		if (testIndex < nearestNeighbors[j - 1]) {
+    	    			condition = Main.trainingDataDistanceMatrix[nearestNeighbors[j]][testIndex] < Main.trainingDataDistanceMatrix[nearestNeighbors[j - 1]][testIndex];
+    	    		}
+    	    		else {
+    	    			condition = Main.trainingDataDistanceMatrix[nearestNeighbors[j]][testIndex] < Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[j - 1]];
+    	    		}
+    	    	}
+    	    	else {
+    	    		if (testIndex < nearestNeighbors[j - 1]) {
+    	    			condition = Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[j]] < Main.trainingDataDistanceMatrix[nearestNeighbors[j - 1]][testIndex];
+    	    		}
+    	    		else {
+    	    			condition = Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[j]] < Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[j - 1]];
+    	    		}
+    	    	}
+        	    if (condition) {
         		int tmp = nearestNeighbors[j - 1];
         		nearestNeighbors[j - 1] = nearestNeighbors[j];
         		nearestNeighbors[j] = tmp;
@@ -72,7 +107,12 @@ public class CrossValidationPredicter {
         	float distance;
         	// Weight by distance squared
         	for (int j = 0; j < Main.k; j++) {
-        	    distance = Main.trainingDataDistanceMatrix[nearestNeighbors[j]][testIndex];
+        		if (testIndex < nearestNeighbors[j]) {
+        			distance = Main.trainingDataDistanceMatrix[nearestNeighbors[j]][testIndex];
+        		}
+        		else {
+        			distance = Main.trainingDataDistanceMatrix[testIndex][nearestNeighbors[j]];
+        		}
         	    votes[Main.trainingData.get(nearestNeighbors[j]).cuisine] += 1 / (distance * distance);
         	}
         	return votes;

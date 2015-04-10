@@ -5,8 +5,9 @@ class Recipe {
 	public int cuisine;
 	HashSet<String> ingredients;
 	public double cuisineEntropy;
-	
-	public Recipe(boolean training, String line) {
+	public int recipeNum;
+	public Recipe(boolean training, String line, int recipeNum) {
+		this.recipeNum = recipeNum;
 		ingredients = new HashSet<String>();
 		String[] lineArray = line.split(" ");
 		if (training) {
@@ -65,6 +66,8 @@ class Recipe {
 	      return customDistance01(other);
 	    case CUSTOM02:
 	      return customDistance02(other);
+	    case GA_JACCARD:
+	    	return jaccardWithGAWeights(other);
 	    default:
 	      System.out.println("ERROR: Invalid distance function selection.");
 	      return Float.MAX_VALUE;
@@ -152,5 +155,25 @@ class Recipe {
 		}
 		//System.out.println("Entropy Distance: " + intersectCuisineSum);
 		return intersectCuisineSum;
+	}
+	
+	private float jaccardWithGAWeights(Recipe other) {
+		HashSet<String> union = new HashSet<String>();
+		union.addAll(this.ingredients);
+		union.addAll(other.ingredients);
+		float unionSize = 0;
+		float intersectSize = 0;
+		
+		for (String ingr : this.ingredients) {
+			if (other.ingredients.contains(ingr)) {
+				intersectSize+= Simulation.currWeights[Main.uniqueIngredients.get(ingr)];
+			}
+		}
+		
+		for (String ingr : union) {
+			unionSize += Simulation.currWeights[Main.uniqueIngredients.get(ingr)];
+		}
+		
+		return 1 - intersectSize / unionSize;
 	}
 }
