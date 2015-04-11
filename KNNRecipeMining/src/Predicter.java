@@ -1,46 +1,67 @@
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class Predicter {
-	public static int predictCuisine(Recipe test,
-			double[] distanceSpaceForThisThread) {
-		// Store the index of the neighbors in the trainingData, can't use
-		// recipe itself
-		// and store distance inside recipe because of multithreading.
+	// Return number correct
+	public static int predictCuisines(HashSet<Recipe> tests, double[] distanceSpaceForThisThread) {
+		long startTime, endTime, seconds;
+		startTime = System.currentTimeMillis();
+		int testNumber = 1, correctPredictions = 0;
+		
 		int[] nearestNeighbors = new int[Main.k];
-		double[] distances = distanceSpaceForThisThread; // new
-															// double[Main.trainingData.size()];
-		int i = 0;
-		// Fill up the nearest neighbors first
-		for (int nearestNeighborsSize = 0; nearestNeighborsSize < Main.k;) {
-			if (!test.equalsRecipe(Main.trainingData.get(i))) {
-				distances[i] = Main.trainingData.get(i).getDistance(test);
-				nearestNeighbors[nearestNeighborsSize] = i;
-				moveRecipeToCorrectLocation(nearestNeighborsSize,
-						nearestNeighbors, distances);
-				nearestNeighborsSize++;
-			} else {
-				//System.out.println("Were not overfitting");
-			}
-			i++;
-		}
+		double[] distances = distanceSpaceForThisThread; 
 
-		// Now go through the rest of the training recipes, keep track of the k
-		// nearest neighbors
-		for (; i < Main.trainingData.size(); i++) {
-			if (!test.equalsRecipe(Main.trainingData.get(i))) {
-				distances[i] = Main.trainingData.get(i).getDistance(test);
-				if (distances[i] < distances[nearestNeighbors[Main.k - 1]]) {
-					nearestNeighbors[Main.k - 1] = i;
-					moveRecipeToCorrectLocation(Main.k - 1, nearestNeighbors,
-							distances);
+		for (Recipe test : tests) {
+			int i = 0;
+			// Fill up the nearest neighbors first
+			
+			for (int nearestNeighborsSize = 0; nearestNeighborsSize < Main.k;) {
+				if (!tests.contains(Main.trainingData.get(i))) {
+					distances[i] = Main.trainingData.get(i).getDistance(test);
+					nearestNeighbors[nearestNeighborsSize] = i;
+					moveRecipeToCorrectLocation(nearestNeighborsSize, nearestNeighbors, distances);
+					nearestNeighborsSize++;
+				} else {
+					//System.out.println("Were not overfitting" );
 				}
-			} else {
-				//System.out.println("Were not overfitting");
+				i++;
 			}
+	
+			// Now go through the rest of the training recipes, keep track of the k
+			// nearest neighbors
+			for (; i < Main.trainingData.size(); i++) {
+				if (!tests.contains(Main.trainingData.get(i))) {
+					distances[i] = Main.trainingData.get(i).getDistance(test);
+					if (distances[i] < distances[nearestNeighbors[Main.k - 1]]) {
+						nearestNeighbors[Main.k - 1] = i;
+						moveRecipeToCorrectLocation(Main.k - 1, nearestNeighbors,
+								distances);
+					}
+				} else {
+					//System.out.println("Were not overfitting");
+				}
+			}
+			int prediction = collectVotesAndMakePrediction(nearestNeighbors, distances);
+			if (prediction == test.cuisine) {
+				correctPredictions++;
+			}
+			//System.out.println("Prediction done " + test.recipeNum);
+			
+			if (testNumber % 500 == 0) {
+				endTime = System.currentTimeMillis();
+				seconds = (endTime - startTime) / 1000;
+				// minutes = (endTime - startTime) / 1000 / 60;
+				System.out.println("One of the threads found " + correctPredictions
+						+ " out of " + testNumber + " so far" + " in "
+						+ seconds + " seconds, Accuracy: " + (double) correctPredictions
+						/ testNumber);
+			}
+			testNumber++;
 		}
-
+		//System.out.println("Prediction of fold is complete, fold size:" +  tests.size());
+		return correctPredictions;
+	}
+	
+	private static int collectVotesAndMakePrediction(int[] nearestNeighbors, double[] distances) {
 		// We now have the k nearest neighbors, tally the votes.
 		double[] votes = null;
 

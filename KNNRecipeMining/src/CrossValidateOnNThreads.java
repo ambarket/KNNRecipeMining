@@ -1,3 +1,5 @@
+import java.util.HashSet;
+
 interface CrossValidationRunnableListener {
 	void receiveData(int threadNum, int count);
 }
@@ -22,13 +24,19 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
 		if (endIndex <= 0 || endIndex > Main.trainingData.size()) {
 			endIndex = Main.trainingData.size();
 		}
-		int numberPerThread = endIndex / Main.numberOfThreads;
+		//int numberPerThread = endIndex / Main.numberOfThreads;
 
+		int foldsPerThread =  (int)Math.ceil(Main.numberOfFolds / (double)Main.numberOfThreads);
+		int numberPerThread = foldsPerThread * Main.numberPerFold;
+		
 		Thread[] threads = new Thread[Main.numberOfThreads];
 
 		for (int threadNum = 0; threadNum < Main.numberOfThreads; threadNum++) {
 			int threadStartIndex = threadNum * numberPerThread;
 			int threadEndIndex = (threadNum + 1) * numberPerThread - 1;
+			// Handle any remaining tests in the last thread
+			if (threadNum == Main.numberOfThreads-1) { threadEndIndex = endIndex; }
+			
 			CrossValidationRunnable tmp = new CrossValidationRunnable(
 					threadNum, threadStartIndex, threadEndIndex, this);
 			threads[threadNum] = new Thread(tmp);
@@ -47,7 +55,7 @@ class CrossValidateOnNThreads implements CrossValidationRunnableListener {
 		// At this point all threads have completed, thus
 		// this.correctPredictions will be set to the total number
 		// of correctPredictions.
-		return ((double) correctPredictions) / Main.trainingData.size();
+		return ((double) correctPredictions) / endIndex;
 	}
 
 	public double runAndReturnResultFromRandomSample(int sampleSize) {
@@ -129,18 +137,17 @@ class CrossValidationRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		double[] distanceSpaceForThisThread = new double[Main.trainingData
-				.size()];
+		double[] distanceSpaceForThisThread = new double[Main.trainingData.size()];
 		long startTime, endTime, seconds;
 		startTime = System.currentTimeMillis();
-
-		for (int i = start; i < end; i++) {
-			Recipe test = Main.trainingData.get(i);
-			int predictedCuisine = Predicter.predictCuisine(test,
-					distanceSpaceForThisThread);
-			if (predictedCuisine == test.cuisine) {
-				correct++;
+		
+		for (int i = start; i < end; i += Main.numberPerFold) {
+			HashSet<Recipe> tests = new HashSet<Recipe>();
+			for (int j = i; j < end && j < i + Main.numberPerFold; j++) {
+				tests.add(Main.trainingData.get(j));
 			}
+			correct += Predicter.predictCuisines(tests, distanceSpaceForThisThread);
+
 			if ((i - start + 1) % 500 == 0) {
 				endTime = System.currentTimeMillis();
 				seconds = (endTime - startTime) / 1000;

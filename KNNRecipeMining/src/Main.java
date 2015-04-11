@@ -14,16 +14,22 @@ enum VoteWeightFunction { DISTANCE, ENTROPY }
 
 public class Main {
     // All other classes just use these static variable to avoid passing a bunch of arguments around.
-	static ArrayList<Recipe> trainingData;
+	static ArrayList<Recipe> trainingData;	// size - 21667 examples
 	// value is array from cuisineID (1 to 7) to number of occurances.
+	// index 0 is the total number of occurances
 	static HashMap<String, int[]> cuisineCounts;
 	static HashMap<String, Integer> uniqueIngredients;
 	
 	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
-	static DistanceFunction distanceFunction = DistanceFunction.GA_JACCARD;
+	static DistanceFunction distanceFunction = DistanceFunction.JACCARD;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
+	
+	// For k-fold cross val, setting this numberOfExamples implies leaveOneOut
+	// Make this a factor of the number of threads for good results
+	static int numberOfFolds = 4;	
+	static int numberPerFold;	// this is set to numberOfExamples / numberOfFolds
 	
 	static float[][] trainingDataDistanceMatrix;
 	
@@ -39,6 +45,9 @@ public class Main {
 			uniqueIngredients.put(ingr, ingrNum);
 			ingrNum++;
 		}
+		numberPerFold = Main.trainingData.size() / numberOfFolds;
+		System.out.println("Number of folds: " + Main.numberOfFolds + " " + "Number in each fold " + numberPerFold);
+
 		//uniqueIngredients = new ArrayList<String>(Main.cuisineCounts.keySet());
 		endTime = System.currentTimeMillis();
 		seconds = (endTime - startTime) / 1000;
@@ -56,9 +65,7 @@ public class Main {
 		endTime = System.currentTimeMillis();
 		seconds = (endTime - startTime) / 1000;
 		*/
-
-
-		/*
+		
 		for (Recipe r : trainingData) {
 			r.setEntropy();
 		}
@@ -73,8 +80,8 @@ public class Main {
 		seconds = (endTime - startTime) / 1000;
 		System.out.println("Ran CrossValidation in " + seconds + " seconds");
 		//SingleThreaded.crossValidate();
-		*/
 		
+		/*
 		Simulation s = new Simulation(30);
 		float[] weights = s.runAndReturnBest(10000000);
 		System.out.print("float[] weights = { ");
@@ -85,6 +92,7 @@ public class Main {
 			}
 		}
 		System.out.print(" };");
+		*/
 	}
 	
 	static int weightFileNum = 0;
@@ -129,9 +137,10 @@ public class Main {
 		for (Recipe r : trainingData) {
 			for (String ingr : r.ingredients) {
 				if (!cuisineCounts.containsKey(ingr)) {
-					cuisineCounts.put(ingr, new int[8]);
+					cuisineCounts.put(ingr, new int[8]);	
 				}
-				cuisineCounts.get(ingr)[r.cuisine]++;;
+				cuisineCounts.get(ingr)[r.cuisine]++;
+				cuisineCounts.get(ingr)[0]++;	// Use index 0 to store total
 			}
 		}
 	}

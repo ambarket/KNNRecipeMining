@@ -1,6 +1,6 @@
 
 public class SingleThreaded {
-	
+	/*
 	public static void crossValidate() {
 	    	double[] distanceSpaceForThisThread = new double[Main.trainingData.size()];
 		double correct = 0;
@@ -25,5 +25,6 @@ public class SingleThreaded {
 		}
 		System.out.println(correct / (Main.trainingData.size() - 1));
 	}
+	*/
 	
 }

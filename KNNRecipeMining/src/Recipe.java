@@ -44,8 +44,26 @@ class Recipe {
 		cuisineEntropy /= ingredients.size();
 	}
 	
-	public boolean equalsRecipe(Recipe other) {
-		return cuisine != -1 && other.cuisine != -1 && ingredients.size() == other.ingredients.size() && ingredients.containsAll(other.ingredients);
+	public boolean equals(Object obj) {
+		if(this == obj) return true;
+		if((obj == null) || (obj.getClass() != this.getClass())) return false;
+		Recipe other = (Recipe)obj;
+		boolean equal = true;
+		equal &= cuisine != -1 && other.cuisine != -1; // They are both from the training set
+		if (equal) equal &= cuisine == other.cuisine;	
+		if (equal) equal &= ingredients.size() == other.ingredients.size();
+		if (equal) ingredients.equals(other.ingredients);
+		
+		return equal;
+	}
+	
+
+	public int hashCode() {
+		int hash = 7;
+		hash = 31 * hash + cuisine;
+		hash = 31 * hash + ingredients.hashCode();
+		hash = 31 * hash + recipeNum;
+		return hash;
 	}
 	
 	public String toString() {
@@ -86,6 +104,7 @@ class Recipe {
 				intersectSize++;
 			}
 		}
+		
 		
 		return 1 - intersectSize / unionSize;
 	}
