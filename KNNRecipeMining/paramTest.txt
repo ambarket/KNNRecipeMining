@@ -1,0 +1,540 @@
+Time(Seconds):	302
+k:	2
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8612636728665712
+Time(Seconds):	300
+k:	4
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8830479531084137
+Time(Seconds):	304
+k:	8
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8887709419855079
+Time(Seconds):	302
+k:	16
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8896940047076198
+Time(Seconds):	299
+k:	32
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8842479346471592
+Time(Seconds):	304
+k:	64
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8767711265980523
+Time(Seconds):	304
+k:	2
+Distance Function:	JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8572021968892787
+Time(Seconds):	301
+k:	4
+Distance Function:	JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.87427885724835
+Time(Seconds):	299
+k:	8
+Distance Function:	JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.879217242811649
+Time(Seconds):	300
+k:	16
+Distance Function:	JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8776018830479531
+Time(Seconds):	288
+k:	32
+Distance Function:	JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8704019938154798
+Time(Seconds):	304
+k:	64
+Distance Function:	JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8612175197304657
+Time(Seconds):	297
+k:	2
+Distance Function:	JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8478331102598422
+Time(Seconds):	302
+k:	4
+Distance Function:	JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8713250565375917
+Time(Seconds):	304
+k:	8
+Distance Function:	JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8770941985507915
+Time(Seconds):	301
+k:	16
+Distance Function:	JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.87658651405363
+Time(Seconds):	304
+k:	32
+Distance Function:	JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8699404624544238
+Time(Seconds):	301
+k:	64
+Distance Function:	JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8606175289610929
+Time(Seconds):	633
+k:	2
+Distance Function:	CUSTOM01
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8697558499100014
+Time(Seconds):	640
+k:	4
+Distance Function:	CUSTOM01
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8894170858909863
+Time(Seconds):	628
+k:	8
+Distance Function:	CUSTOM01
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8968477408039877
+Time(Seconds):	648
+k:	16
+Distance Function:	CUSTOM01
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8954631467208197
+Time(Seconds):	645
+k:	32
+Distance Function:	CUSTOM01
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8929708773711174
+Time(Seconds):	632
+k:	64
+Distance Function:	CUSTOM01
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8856325287303273
+Time(Seconds):	637
+k:	2
+Distance Function:	CUSTOM01
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8642174735773296
+Time(Seconds):	634
+k:	4
+Distance Function:	CUSTOM01
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8808787557114506
+Time(Seconds):	636
+k:	8
+Distance Function:	CUSTOM01
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8865555914524392
+Time(Seconds):	632
+k:	16
+Distance Function:	CUSTOM01
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8832325656528361
+Time(Seconds):	646
+k:	32
+Distance Function:	CUSTOM01
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.881294133936401
+Time(Seconds):	638
+k:	64
+Distance Function:	CUSTOM01
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8721096598513869
+Time(Seconds):	636
+k:	2
+Distance Function:	CUSTOM01
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8584944847002354
+Time(Seconds):	639
+k:	4
+Distance Function:	CUSTOM01
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8787095583144875
+Time(Seconds):	634
+k:	8
+Distance Function:	CUSTOM01
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8859094475469608
+Time(Seconds):	638
+k:	16
+Distance Function:	CUSTOM01
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.881755665297457
+Time(Seconds):	642
+k:	32
+Distance Function:	CUSTOM01
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8813402870725066
+Time(Seconds):	635
+k:	64
+Distance Function:	CUSTOM01
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.871417362809803
+Time(Seconds):	284
+k:	2
+Distance Function:	CUSTOM02
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.4627313425947293
+Time(Seconds):	283
+k:	4
+Distance Function:	CUSTOM02
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.53297641574745
+Time(Seconds):	263
+k:	8
+Distance Function:	CUSTOM02
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.5937139428624175
+Time(Seconds):	285
+k:	16
+Distance Function:	CUSTOM02
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.6353902247657728
+Time(Seconds):	284
+k:	32
+Distance Function:	CUSTOM02
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.6655743757788342
+Time(Seconds):	282
+k:	64
+Distance Function:	CUSTOM02
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.6803433793326257
+Time(Seconds):	289
+k:	2
+Distance Function:	CUSTOM02
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.4733465638990169
+Time(Seconds):	287
+k:	4
+Distance Function:	CUSTOM02
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.55803756865279
+Time(Seconds):	287
+k:	8
+Distance Function:	CUSTOM02
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.6220058152951493
+Time(Seconds):	285
+k:	16
+Distance Function:	CUSTOM02
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.6577744957769881
+Time(Seconds):	285
+k:	32
+Distance Function:	CUSTOM02
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.6797433885632529
+Time(Seconds):	282
+k:	64
+Distance Function:	CUSTOM02
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.6912355194535469
+Time(Seconds):	283
+k:	2
+Distance Function:	CUSTOM02
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.46125444223935014
+Time(Seconds):	282
+k:	4
+Distance Function:	CUSTOM02
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.5505146074675774
+Time(Seconds):	284
+k:	8
+Distance Function:	CUSTOM02
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.6142982415655144
+Time(Seconds):	288
+k:	16
+Distance Function:	CUSTOM02
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.6538514792080122
+Time(Seconds):	281
+k:	32
+Distance Function:	CUSTOM02
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.6771126598052337
+Time(Seconds):	280
+k:	64
+Distance Function:	CUSTOM02
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.6878663405178382
+Time(Seconds):	0
+k:	2
+Distance Function:	GA_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	4
+Distance Function:	GA_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	8
+Distance Function:	GA_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	16
+Distance Function:	GA_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	32
+Distance Function:	GA_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	64
+Distance Function:	GA_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	2
+Distance Function:	GA_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	4
+Distance Function:	GA_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	8
+Distance Function:	GA_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	16
+Distance Function:	GA_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	32
+Distance Function:	GA_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	64
+Distance Function:	GA_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	2
+Distance Function:	GA_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	4
+Distance Function:	GA_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	8
+Distance Function:	GA_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	16
+Distance Function:	GA_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	32
+Distance Function:	GA_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	0
+k:	64
+Distance Function:	GA_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.0
+Time(Seconds):	428
+k:	2
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8538791710896756
+Time(Seconds):	424
+k:	4
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8735404070706605
+Time(Seconds):	427
+k:	8
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8804633774865002
+Time(Seconds):	439
+k:	16
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8813864402086121
+Time(Seconds):	428
+k:	32
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8767711265980523
+Time(Seconds):	425
+k:	64
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8702173812710574
+Time(Seconds):	420
+k:	2
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8472331194904694
+Time(Seconds):	421
+k:	4
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8591867817418194
+Time(Seconds):	428
+k:	8
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8644943923939632
+Time(Seconds):	426
+k:	16
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8626482669497393
+Time(Seconds):	428
+k:	32
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.853140720911986
+Time(Seconds):	431
+k:	64
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	ENTROPY
+numberOfFolds:	4
+Accuracy:	0.8401716896663128
+Time(Seconds):	427
+k:	2
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8411409055245304
+Time(Seconds):	428
+k:	4
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.856694512392117
+Time(Seconds):	434
+k:	8
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8644943923939632
+Time(Seconds):	430
+k:	16
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8622790418608944
+Time(Seconds):	422
+k:	32
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8500023076568053
+Time(Seconds):	424
+k:	64
+Distance Function:	CUISINE_PROB_JACCARD
+Vote Weighting:	NONE
+numberOfFolds:	4
+Accuracy:	0.8396178520330456

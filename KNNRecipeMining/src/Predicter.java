@@ -72,8 +72,8 @@ public class Predicter {
 		case ENTROPY:
 			votes = getVotesWeightedByEntropy(nearestNeighbors, distances);
 			break;
-		default:
-			System.out.println("ERROR: Invalid vote weight function selection");
+		case NONE:
+			votes = getNonWeightedVotes(nearestNeighbors);
 			break;
 		}
 
@@ -98,6 +98,17 @@ public class Predicter {
 				nearestNeighbors[j] = tmp;
 			}
 		}
+	}
+	
+	private static double[] getNonWeightedVotes(int[] nearestNeighbors) {
+		double[] votes = new double[8]; // 0 is unused, cuisines are numbered 1
+		// through 7.
+
+		// Weight by distance squared
+		for (int j = 0; j < Main.k; j++) {
+			votes[Main.trainingData.get(nearestNeighbors[j]).cuisine] += 1;
+		}
+		return votes;
 	}
 
 	private static double[] getVotesWeightedByDistance(int[] nearestNeighbors,

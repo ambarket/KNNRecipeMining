@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
-enum DistanceFunction { JACCARD, CUSTOM01, CUSTOM02, GA_JACCARD }
-enum VoteWeightFunction { DISTANCE, ENTROPY }
+enum DistanceFunction { JACCARD, CUSTOM01, CUSTOM02, GA_JACCARD, CUISINE_PROB_JACCARD }
+enum VoteWeightFunction { DISTANCE, ENTROPY, NONE }
 
 public class Main {
     // All other classes just use these static variable to avoid passing a bunch of arguments around.
@@ -18,12 +18,14 @@ public class Main {
 	// value is array from cuisineID (1 to 7) to number of occurances.
 	// index 0 is the total number of occurances
 	static HashMap<String, int[]> cuisineCounts;
+	static HashMap<String, float[]> cuisineProbabilitiesByIngr;
 	static HashMap<String, Integer> uniqueIngredients;
+	static float[] cusisineIngrWeights;
 	
 	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
-	static DistanceFunction distanceFunction = DistanceFunction.JACCARD;
+	static DistanceFunction distanceFunction = DistanceFunction.CUISINE_PROB_JACCARD;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
 	
 	// For k-fold cross val, setting this numberOfExamples implies leaveOneOut
@@ -39,12 +41,18 @@ public class Main {
 		startTime = System.currentTimeMillis();
 	    setTrainingData();
 		setCuisineCounts();
+		
 		int ingrNum = 0;
 		uniqueIngredients = new HashMap<String, Integer>();
 		for (String ingr : Main.cuisineCounts.keySet()) {
 			uniqueIngredients.put(ingr, ingrNum);
 			ingrNum++;
 		}
+		
+		setCuisineProbabilitiesByIngr();
+		setCuisineIngrWeightsFromCuisineProbabilities();
+		
+
 		numberPerFold = Main.trainingData.size() / numberOfFolds;
 		System.out.println("Number of folds: " + Main.numberOfFolds + " " + "Number in each fold " + numberPerFold);
 
@@ -69,6 +77,8 @@ public class Main {
 		for (Recipe r : trainingData) {
 			r.setEntropy();
 		}
+		runTestsOnParameters();
+		/*
 		CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
 
 		
@@ -80,7 +90,7 @@ public class Main {
 		seconds = (endTime - startTime) / 1000;
 		System.out.println("Ran CrossValidation in " + seconds + " seconds");
 		//SingleThreaded.crossValidate();
-		
+		*/
 		/*
 		Simulation s = new Simulation(30);
 		float[] weights = s.runAndReturnBest(10000000);
@@ -94,6 +104,45 @@ public class Main {
 		System.out.print(" };");
 		*/
 	}
+	
+	public static void runTestsOnParameters() {
+		File output = new File("paramTest.txt");
+		for (DistanceFunction df : DistanceFunction.values()) {
+			for (VoteWeightFunction vf : VoteWeightFunction.values()) {
+				for (int newK = 2; newK < 128; newK*=2) {
+					long startTime, endTime, seconds;
+					startTime = System.currentTimeMillis();
+					Main.distanceFunction = df;
+					Main.voteWeightFunction = vf;
+					Main.k = newK;
+					Main.numberOfFolds = 4;	
+					Main.numberPerFold = Main.trainingData.size() / Main.numberOfFolds;
+					CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
+					startTime = System.currentTimeMillis();
+					double accuracy = crossValidator.runAndReturnResult();
+					
+					System.out.println("Accuracy: " + accuracy);
+					endTime = System.currentTimeMillis();
+					seconds = (endTime - startTime) / 1000;
+					System.out.println("Ran CrossValidation in " + seconds + " seconds");
+					try {
+						BufferedWriter bw = new BufferedWriter(new FileWriter(output, true));
+						bw.write("Time(Seconds):" + '\t' + seconds + '\n');
+						bw.write("k:" + '\t' + Main.k + '\n');
+						bw.write("Distance Function:" + '\t' + Main.distanceFunction.toString() + '\n');
+						bw.write("Vote Weighting:" + '\t' + Main.voteWeightFunction.toString() + '\n');
+						bw.write("numberOfFolds:" + '\t' + Main.numberOfFolds + '\n');
+						bw.write("Accuracy:" + '\t' + accuracy + '\n');
+						bw.flush();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
 	
 	static int weightFileNum = 0;
 	public static void writeWeightsToFile(float[] weights, float accurracy) {
@@ -142,6 +191,37 @@ public class Main {
 				cuisineCounts.get(ingr)[r.cuisine]++;
 				cuisineCounts.get(ingr)[0]++;	// Use index 0 to store total
 			}
+		}
+	}
+	
+	public static void setCuisineProbabilitiesByIngr() {
+		
+		cuisineProbabilitiesByIngr = new HashMap<String, float[]>();
+		for (String ingr : Main.uniqueIngredients.keySet()) {
+			float[] probabilities = new float[Main.uniqueIngredients.size()];
+			int[] ingrCuisineCounts = Main.cuisineCounts.get(ingr);
+			for (int i = 1; i < 8; i++) {
+				probabilities[i] = ingrCuisineCounts[i] / ingrCuisineCounts[0];
+			}
+			cuisineProbabilitiesByIngr.put(ingr, probabilities);
+		}
+	}
+	
+	public static void setCuisineIngrWeightsFromCuisineProbabilities() {
+		cusisineIngrWeights = new float[Main.uniqueIngredients.size()];
+		
+		for (String ingr : Main.uniqueIngredients.keySet()) {
+			float[] probabilities = Main.cuisineProbabilitiesByIngr.get(ingr);
+			float minProb = Float.MAX_VALUE, maxProb = Float.MIN_VALUE;
+			for (int i = 1; i < 8; i++) {
+				if (probabilities[i] < minProb) {
+					minProb = probabilities[i];
+				}
+				if (probabilities[i] > maxProb) {
+					maxProb = probabilities[i];
+				}
+			}
+			cusisineIngrWeights[Main.uniqueIngredients.get(ingr)] = maxProb - minProb;
 		}
 	}
 	
