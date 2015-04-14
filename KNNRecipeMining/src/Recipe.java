@@ -209,27 +209,27 @@ class Recipe {
 				int count2  = other.ingredientsCounts.get(ingredient);
 				
 				int minVal = Math.min(count, count2);
-				intersectSize += (minVal * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
+				intersectSize += minVal;// * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
 			}
 		}
 		
-//		for (int count : other.ingredientsCounts.values()) {
-//			
-//			unionSize += count;
-//		}
-		
-		for (String ingredient : other.ingredients) {
-			if( other.ingredientsCounts.containsKey(ingredient))
-				unionSize += (other.ingredientsCounts.get(ingredient) * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
+		for (int count : other.ingredientsCounts.values()) {
+			
+			unionSize += count;
 		}
 		
-		for (String ingredient : this.ingredients) {
-			if( this.ingredientsCounts.containsKey(ingredient))
-				unionSize += (this.ingredientsCounts.get(ingredient) * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
-		}
-//		for (int count : this.ingredientsCounts.values()) {
-//			unionSize += count;
+//		for (String ingredient : other.ingredients) {
+//			if( other.ingredientsCounts.containsKey(ingredient))
+//				unionSize += other.ingredientsCounts.get(ingredient);// * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
 //		}
+//		
+//		for (String ingredient : this.ingredients) {
+//			if( this.ingredientsCounts.containsKey(ingredient))
+//				unionSize += this.ingredientsCounts.get(ingredient);// * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
+//		}
+		for (int count : this.ingredientsCounts.values()) {
+			unionSize += count;
+		}
 		
 		return 1 - intersectSize / unionSize;
 	}
