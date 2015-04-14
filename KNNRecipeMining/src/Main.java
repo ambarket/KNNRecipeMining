@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 
 enum DistanceFunction { JACCARD, CUSTOM01, CUSTOM02, GA_JACCARD, CUISINE_PROB_JACCARD }
@@ -15,6 +16,7 @@ enum VoteWeightFunction { DISTANCE, ENTROPY, NONE }
 public class Main {
     // All other classes just use these static variable to avoid passing a bunch of arguments around.
 	static ArrayList<Recipe> trainingData;	// size - 21667 examples
+	static HashSet<String> tabooList;
 	// value is array from cuisineID (1 to 7) to number of occurances.
 	// index 0 is the total number of occurances
 	static HashMap<String, int[]> cuisineCounts;
@@ -25,6 +27,8 @@ public class Main {
 	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
+	static int o = 0; // minimum threshold for words that appear in One cuisine (i.e. value of 0 will take all)
+	static int s = 100; // minimum difference of proportions for words that appear in Seven cuisines
 	static DistanceFunction distanceFunction = DistanceFunction.CUISINE_PROB_JACCARD;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
 	
@@ -39,6 +43,7 @@ public class Main {
 	public static void main(String[] args) {
 		long startTime, endTime, seconds;
 		startTime = System.currentTimeMillis();
+		buildTabooSet();
 	    setTrainingData();
 		setCuisineCounts();
 		
@@ -159,6 +164,48 @@ public class Main {
 		}
 	}
 	
+	public static void buildTabooSet() {
+		try {
+			tabooList = new HashSet<String>();
+			String line;
+			String splitLine[];
+			String splitProportions[];
+			BufferedReader br = new BufferedReader(new FileReader(new File("all.txt")));
+			while ((line = br.readLine()) != null) {
+				splitLine = line.split(":");
+				if (splitLine.length != 2) {
+					System.out.println("ERROR? " + line);
+				}
+				splitProportions = splitLine[1].split(" ");
+				double min, max;
+				min = max = Double.parseDouble(splitProportions[0]);
+				for (int i = 1; i < splitProportions.length; i++) {
+					double current = Double.parseDouble(splitProportions[i]);
+					min = min < current ? min : current;
+					max = max > current ? max : current;
+				}
+				if (max - min > s) {
+					tabooList.add(splitLine[0]);
+				}
+			}
+			br.close();
+			
+			br = new BufferedReader(new FileReader(new File("one.txt")));
+			while ((line = br.readLine()) != null) {
+				splitLine = line.split(":");
+				if (splitLine.length != 2) {
+					System.out.println("ERROR? " + line);
+				}
+				if (Integer.parseInt(splitLine[1]) < o ) {
+					tabooList.add(splitLine[0]);
+				}
+			}
+			br.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+	}
 	
 	public static void setTrainingData() {
 		String trainingFile = "training-data.txt";
