@@ -1,14 +1,17 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 class Recipe {
 	public int cuisine;
 	HashSet<String> ingredients;
+	HashMap<String, Integer> ingredientsCounts;
 	public double cuisineEntropy;
 	public int recipeNum;
 	public Recipe(boolean training, String line, int recipeNum) {
 		this.recipeNum = recipeNum;
 		ingredients = new HashSet<String>();
+		ingredientsCounts = new HashMap<String, Integer>();
 		String[] lineArray = line.split(" ");
 		if (training) {
 			cuisine = Integer.parseInt(lineArray[0]);
@@ -20,8 +23,18 @@ class Recipe {
 		for (int i = 1; i < lineArray.length; i++) {
 			if (!(Main.tabooList.contains(lineArray[i]))) {
 				ingredients.add(lineArray[i]);
+				
+				if (!ingredientsCounts.containsKey(lineArray[i])) {
+					ingredientsCounts.put(lineArray[i], 0);
+				}
+				ingredientsCounts.put(lineArray[i], ingredientsCounts.get(lineArray[i]) + 1);
+				
 			}
-		}		
+		}
+		
+		if(ingredients.size() == 0){
+			System.err.println("\tEmpty Recipe.");
+		}
 	}
 	
 	public void setEntropy() {
@@ -89,7 +102,8 @@ class Recipe {
 	    case GA_JACCARD:
 	    	return jaccardWithGAWeights(other);
 	    case CUISINE_PROB_JACCARD:
-	    	return jaccardWithCusineIngrWeights(other);
+	    	//return jaccardWithCusineIngrWeights(other);
+	    	return jaccardBagsWith(other);
 	    default:
 	      System.out.println("ERROR: Invalid distance function selection.");
 	      return Float.MAX_VALUE;
@@ -178,6 +192,46 @@ class Recipe {
 		}
 		//System.out.println("Entropy Distance: " + intersectCuisineSum);
 		return intersectCuisineSum;
+	}
+	
+	private float jaccardBagsWith(Recipe other) {
+		
+		HashSet<String> union = new HashSet<String>();
+		union.addAll(this.ingredients);
+		union.addAll(other.ingredients);
+		float unionSize = 0;
+		float intersectSize = 0;
+		
+		for (String ingredient : other.ingredients) {
+
+			if(this.ingredients.contains(ingredient)) {
+				int count = this.ingredientsCounts.get(ingredient);
+				int count2  = other.ingredientsCounts.get(ingredient);
+				
+				int minVal = Math.min(count, count2);
+				intersectSize += (minVal * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
+			}
+		}
+		
+//		for (int count : other.ingredientsCounts.values()) {
+//			
+//			unionSize += count;
+//		}
+		
+		for (String ingredient : other.ingredients) {
+			if( other.ingredientsCounts.containsKey(ingredient))
+				unionSize += (other.ingredientsCounts.get(ingredient) * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
+		}
+		
+		for (String ingredient : this.ingredients) {
+			if( this.ingredientsCounts.containsKey(ingredient))
+				unionSize += (this.ingredientsCounts.get(ingredient) * Main.cusisineIngrWeights[Main.uniqueIngredients.get(ingredient)]);
+		}
+//		for (int count : this.ingredientsCounts.values()) {
+//			unionSize += count;
+//		}
+		
+		return 1 - intersectSize / unionSize;
 	}
 	
 	private float jaccardWithCusineIngrWeights(Recipe other) {

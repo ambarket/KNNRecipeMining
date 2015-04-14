@@ -538,3 +538,9 @@ Distance Function:	CUISINE_PROB_JACCARD
 Vote Weighting:	NONE
 numberOfFolds:	4
 Accuracy:	0.8396178520330456
+Time(Seconds):	252
+k:	2
+Distance Function:	JACCARD
+Vote Weighting:	DISTANCE
+numberOfFolds:	4
+Accuracy:	0.8613559791387825

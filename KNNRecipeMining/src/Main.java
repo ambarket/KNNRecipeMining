@@ -27,7 +27,7 @@ public class Main {
 	// Parameter to tune
 	static int k = 10;
 	static int numberOfThreads = 4;
-	static int o = 0; // minimum threshold for words that appear in One cuisine (i.e. value of 0 will take all)
+	static int o = 4; // minimum threshold for words that appear in One cuisine (i.e. value of 0 will take all)
 	static int s = 100; // minimum difference of proportions for words that appear in Seven cuisines
 	static DistanceFunction distanceFunction = DistanceFunction.CUISINE_PROB_JACCARD;
 	static VoteWeightFunction voteWeightFunction = VoteWeightFunction.DISTANCE;
@@ -82,8 +82,8 @@ public class Main {
 		for (Recipe r : trainingData) {
 			r.setEntropy();
 		}
-		runTestsOnParameters();
-		/*
+		//runTestsOnParameters();
+		
 		CrossValidateOnNThreads crossValidator = new CrossValidateOnNThreads();
 
 		
@@ -95,7 +95,7 @@ public class Main {
 		seconds = (endTime - startTime) / 1000;
 		System.out.println("Ran CrossValidation in " + seconds + " seconds");
 		//SingleThreaded.crossValidate();
-		*/
+		
 		/*
 		Simulation s = new Simulation(30);
 		float[] weights = s.runAndReturnBest(10000000);
@@ -204,7 +204,7 @@ public class Main {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
+		System.err.println("\tSize of taboo list: " + tabooList.size());
 	}
 	
 	public static void setTrainingData() {
@@ -218,9 +218,14 @@ public class Main {
 			
 			String line;
 			int recipeNum = 0;
+			int linenum = 0;
 			while ((line = br.readLine()) != null) {
 				trainingData.add(new Recipe(true, line, recipeNum));
 				recipeNum++;
+				if(line.length() < 5) {
+					System.err.println("\tSmall Line on line num: " + linenum + ", line: " + line);
+				}
+				linenum++;
 			}
 			br.close();
 		} catch (IOException e) {

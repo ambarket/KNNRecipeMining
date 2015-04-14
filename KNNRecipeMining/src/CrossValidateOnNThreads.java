@@ -135,7 +135,6 @@ class CrossValidationRunnable implements Runnable {
 		this.listener = listener;
 	}
 
-	@Override
 	public void run() {
 		double[] distanceSpaceForThisThread = new double[Main.trainingData.size()];
 		long startTime, endTime, seconds;
