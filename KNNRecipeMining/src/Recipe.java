@@ -18,7 +18,9 @@ class Recipe {
 		}
 		
 		for (int i = 1; i < lineArray.length; i++) {
-			ingredients.add(lineArray[i]);
+			if (!(Main.tabooList.contains(lineArray[i]))) {
+				ingredients.add(lineArray[i]);
+			}
 		}		
 	}
 	
